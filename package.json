@@ -2,15 +2,23 @@
   "name": "set",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/",
   "dependencies": {
     "express": "^4.17.1",
+    "express-ws": "^4.0.0",
+    "global": "^4.4.0",
+    "node-ts": "^5.0.3",
+    "nodemon": "^1.19.4",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-scripts": "3.2.0",
+    "ts-node": "^8.5.0",
     "ws": "^7.2.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "client": "react-scripts start",
+    "server": "cd server && ts-node-dev index.ts",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -33,7 +41,10 @@
   "proxy": "http://localhost:8080/api",
   "devDependencies": {
     "@types/express": "^4.17.2",
+    "@types/express-ws": "^3.0.0",
     "@types/ws": "^6.0.3",
+    "concurrently": "^5.0.0",
+    "ts-node-dev": "^1.0.0-pre.44",
     "typescript": "^3.7.2"
   }
 }
