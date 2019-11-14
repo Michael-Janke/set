@@ -1,23 +1,23 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React, {
-  ElementType, ComponentProps, Props, ClassAttributes, HTMLAttributes
-} from 'react';
-import './Card.css';
-import classNames from 'classnames';
-import PropTypes, { InferProps } from 'prop-types';
+import React from "react";
+import "./Card.css";
+import classNames from "classnames";
 
-
-interface CardProps<T> extends P<T> {
-  Component: T,
-  className: string;
-
+interface WrapperComponent {
+  <C extends React.ElementType>(
+    props: OwnProps<C> & React.ComponentProps<C>
+  ): JSX.Element;
 }
 
-const Card: React.FC<CardProps<ElementType>> = ({
-  Component,
+interface OwnProps<C> {
+  className?: string;
+  component?: C;
+}
+
+const Card: WrapperComponent = ({
+  component: Component = "div",
   className,
   ...other
-}: CardProps<ElementType>) => <Component className={classNames('Card', className)} {...other} />;
-
+}) => <Component className={classNames("Card", className)} {...other} />;
 
 export default Card;
