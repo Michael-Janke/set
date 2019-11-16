@@ -37,7 +37,7 @@
     "server": "cd server && ts-node-dev index.ts",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!@juggle/resize-observer)/\"",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

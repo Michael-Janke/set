@@ -22,7 +22,9 @@ const useStyles = createUseStyles({
     height: 450,
     willChange: "transform",
     borderRadius: 10,
-    padding: "5%",
+    padding: 30,
+    boxShadow:
+      "0 12.5px 100px -10px rgba(50, 50, 73, 0.4), 0 10px 10px -10px rgba(50, 50, 73, 0.3)",
     "& svg": {
       width: "100%"
     }

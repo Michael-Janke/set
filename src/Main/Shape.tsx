@@ -20,7 +20,7 @@ const CrossHatch = ({
       height="1.5"
       patternTransform="rotate(45)"
     >
-      <line x1="0" y="0" x2="0" y2="1.5" stroke={color} stroke-width="1.5" />
+      <line x1="0" y="0" x2="0" y2="1.5" stroke={color} strokeWidth="1.5" />
     </pattern>
   </defs>
 );
@@ -53,7 +53,7 @@ export default function ShapeSvg({ shape, color, fill }: ShapeSvgProps) {
         strokeWidth={3}
         d={path}
         fill={fills[fill]}
-        fill-opacity={fill === Fill.None ? 0 : 1}
+        fillOpacity={fill === Fill.None ? 0 : 1}
       />
     </svg>
   );

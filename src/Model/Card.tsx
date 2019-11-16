@@ -46,17 +46,18 @@ export default class Card {
   }
 }
 
+export type CardProperty = Shape | Fill | Number | Color;
+const isSameOrDifferent = <T extends CardProperty>(a: T, b: T, c: T) => {
+  if (a === b) return b === c; // if a = b, then b must be = c
+  if (a === c) return false; // if a != b, c can't be equal either
+  return b !== c; // a != b and a != c, so b must be !== c
+};
+
 export const isSet = (card1: Card, card2: Card, card3: Card) => {
-  const setNumbers = [false, true, true, false, true, false, false, true]; //1,2,4,7
-  const shape = (1 << card1.shape) | (1 << card2.shape) | (1 << card3.shape);
-  const fill = (1 << card1.fill) | (1 << card2.fill) | (1 << card3.fill);
-  const number =
-    (1 << card1.number) | (1 << card2.number) | (1 << card3.number);
-  const color = (1 << card1.color) | (1 << card2.color) | (1 << card3.color);
   return (
-    setNumbers[shape] &&
-    setNumbers[fill] &&
-    setNumbers[number] &&
-    setNumbers[color]
+    isSameOrDifferent<Shape>(card1.shape, card2.shape, card3.shape) &&
+    isSameOrDifferent<Color>(card1.color, card2.color, card3.color) &&
+    isSameOrDifferent<Fill>(card1.fill, card2.fill, card3.fill) &&
+    isSameOrDifferent<Number>(card1.number, card2.number, card3.number)
   );
 };

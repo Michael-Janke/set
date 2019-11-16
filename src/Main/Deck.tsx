@@ -24,7 +24,6 @@ export default function Deck() {
     <div ref={ref} className="deck">
       {props.map(({ x, y }, i) => (
         <Card
-          component={"div"}
           key={i}
           style={{
             transform: interpolate(

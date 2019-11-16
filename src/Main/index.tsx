@@ -4,7 +4,6 @@ import Deck from "./Deck";
 import Game from "../Model/Game";
 
 export default function Main() {
-  console.log(new Game());
   return (
     <div className="main">
       <Deck />
