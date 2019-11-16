@@ -2,22 +2,17 @@
 import React from "react";
 import "./Card.css";
 import classNames from "classnames";
+import ShapeSvg from "./Shape";
+import { Fill, Color, Shape } from "../Model/Card";
 
-interface WrapperComponent {
-  <C extends React.ElementType>(
-    props: OwnProps<C> & React.ComponentProps<C>
-  ): JSX.Element;
-}
-
-interface OwnProps<C> {
+interface CardProps extends React.PropsWithChildren<any> {
   className?: string;
-  component?: C;
 }
 
-const Card: WrapperComponent = ({
-  component: Component = "div",
-  className,
-  ...other
-}) => <Component className={classNames("Card", className)} {...other} />;
+const Card = ({ component: Component = "div", ...other }) => (
+  <div>
+    <ShapeSvg fill={Fill.Dotted} color={Color.Red} shape={Shape.Square} />
+  </div>
+);
 
 export default Card;

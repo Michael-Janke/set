@@ -6,14 +6,6 @@ import deckReducer from "./Deck.reducer";
 import "./Deck.css";
 import Card from "./Card";
 
-const Test: React.SFC<{ style: object; hallo: string }> = ({
-  style,
-  hallo
-}: {
-  style: object;
-  hallo: string;
-}) => <div>{JSON.stringify(style)}</div>;
-
 export default function Deck() {
   const [ref, bounds] = useMeasure();
   const [state, dispatch] = React.useReducer(
@@ -32,10 +24,8 @@ export default function Deck() {
     <div ref={ref} className="deck">
       {props.map(({ x, y }, i) => (
         <Card
-          //component={Test}
+          component={"div"}
           key={i}
-          hallo="2"
-          className=""
           style={{
             transform: interpolate(
               [x, y],

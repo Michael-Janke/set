@@ -1,22 +1,22 @@
-enum Shape {
+export enum Shape {
   Square,
   Round,
   Wave
 }
 
-enum Fill {
+export enum Fill {
   None,
   Dotted,
   Filled
 }
 
-enum Number {
+export enum Number {
   One,
   Two,
   Three
 }
 
-enum Color {
+export enum Color {
   Green,
   Red,
   Purple
