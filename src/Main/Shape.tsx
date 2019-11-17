@@ -14,7 +14,7 @@ const CrossHatch = ({
 }) => (
   <defs>
     <pattern
-      id="pattern"
+      id={"pattern" + color}
       patternUnits="userSpaceOnUse"
       width="1.5"
       height="1.5"
@@ -41,7 +41,7 @@ export default function ShapeSvg({ shape, color, fill }: ShapeSvgProps) {
     [Color.Red]: "#c62828"
   };
   const fills: { [x in Color]: string | undefined } = {
-    [Fill.Dotted]: "url(#pattern) " + colors[color],
+    [Fill.Dotted]: "url(#pattern" + colors[color] + ") " + colors[color],
     [Fill.Filled]: colors[color],
     [Fill.None]: undefined
   };

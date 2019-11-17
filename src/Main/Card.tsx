@@ -3,44 +3,44 @@ import React from "react";
 import "./Card.css";
 import { createUseStyles } from "react-jss";
 import ShapeSvg from "./Shape";
-import { Fill, Color, Shape, Number } from "../Model/Card";
+import CardModel from "../Model/Card";
 
 interface CardProps extends React.PropsWithChildren<any> {
-  className?: string;
-  style: React.HTMLAttributes<any>["style"];
+  card: CardModel;
 }
 
 const useStyles = createUseStyles({
   root: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    right: 0,
+    left: 0,
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-around",
     alignItems: "center",
     boxSizing: "border-box",
     backgroundColor: "white",
-    width: 300,
-    height: 450,
     willChange: "transform",
-    borderRadius: 10,
-    padding: 30,
-    boxShadow:
-      "0 12.5px 100px -10px rgba(50, 50, 73, 0.4), 0 10px 10px -10px rgba(50, 50, 73, 0.3)",
+    borderRadius: "3%",
+    padding: "10%",
     "& svg": {
       width: "100%"
     }
   }
 });
 
-const Card = ({ style }: CardProps) => {
+const Card = ({ card }: CardProps) => {
   const classes = useStyles();
   return (
-    <div className={classes.root} style={style}>
-      {[0, ...Array(Number.One)].map((_, i) => (
+    <div className={classes.root}>
+      {[0, ...Array(card.number)].map((_, i) => (
         <ShapeSvg
           key={i}
-          fill={Fill.Dotted}
-          color={Color.Red}
-          shape={Shape.Square}
+          fill={card.fill}
+          color={card.color}
+          shape={card.shape}
         />
       ))}
     </div>
