@@ -1,13 +1,18 @@
-import React from 'react';
-import './App.css';
-import Main from './Main';
+import React, { useContext } from "react";
+import { useObserver } from "mobx-react-lite";
+import "./App.css";
+import Main from "./Main";
+import Game from "./Model/Game";
+import Connecting from "./Connecting";
 
 function App() {
-  return (
+  const game = useContext(Game);
+  return useObserver(() => (
     <div className="App">
-      <Main />
+      {!game.connected && <Connecting />}
+      {game.connected && <Main />}
     </div>
-  );
+  ));
 }
 
 export default App;

@@ -11,6 +11,7 @@ interface CardProps extends React.PropsWithChildren<any> {
 
 const useStyles = createUseStyles({
   root: {
+    zIndex: 2,
     position: "absolute",
     top: 0,
     bottom: 0,
@@ -18,13 +19,14 @@ const useStyles = createUseStyles({
     left: 0,
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-around",
+    justifyContent: "center",
     alignItems: "center",
     boxSizing: "border-box",
     backgroundColor: "white",
     willChange: "transform",
     borderRadius: "3%",
     padding: "10%",
+    transform: "translateZ(1px)",
     "& svg": {
       width: "100%"
     }

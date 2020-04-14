@@ -1,25 +1,32 @@
 export enum Shape {
   Square,
   Round,
-  Wave
+  Wave,
 }
 
 export enum Fill {
   None,
   Dotted,
-  Filled
+  Filled,
 }
 
 export enum Number {
   One,
   Two,
-  Three
+  Three,
 }
 
 export enum Color {
   Green,
   Red,
-  Purple
+  Purple,
+}
+
+interface iCard {
+  shape: Shape;
+  fill: Fill;
+  number: Number;
+  color: Color;
 }
 
 export default class Card {
@@ -27,22 +34,22 @@ export default class Card {
   fill: Fill;
   number: Number;
   color: Color;
+  id: number;
 
-  constructor({
-    shape,
-    fill,
-    number,
-    color
-  }: {
-    shape: Shape;
-    fill: Fill;
-    number: Number;
-    color: Color;
-  }) {
+  constructor(data: iCard, id: number) {
+    const { shape, fill, number, color } = data;
     this.shape = shape;
     this.fill = fill;
     this.number = number;
     this.color = color;
+    this.id = id;
+  }
+
+  isEqual(card: Card) {
+    this.shape = card.shape;
+    this.fill = card.fill;
+    this.number = card.number;
+    this.color = card.color;
   }
 }
 

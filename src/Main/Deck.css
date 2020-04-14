@@ -2,13 +2,14 @@
   height: 100%;
   width: 100%;
   position: relative;
+  transform-style: preserve-3d;
 }
 
 .cardWrapper {
   position: absolute;
   width: 100px;
   height: 150px;
-  box-shadow: 0 12.5px 100px -10px rgba(50, 50, 73, 0.4),
-    0 10px 10px -10px rgba(50, 50, 73, 0.3);
+
   transform-origin: left top;
+  transform-style: preserve-3d;
 }

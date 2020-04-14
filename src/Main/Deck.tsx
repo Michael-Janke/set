@@ -1,111 +1,112 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useSprings, animated, interpolate } from "react-spring";
+import { useDrag } from "react-use-gesture";
 import useMeasure from "react-use-measure";
-import { $enum } from "ts-enum-util";
+import { useObserver } from "mobx-react-lite";
+import { autorun, reaction, observe } from "mobx";
 
-import CardModel, { Fill, Color, Shape, Number } from "../Model/Card";
+import CardModel from "../Model/Card";
 import "./Deck.css";
 import Card from "./Card";
+import Game from "../Model/Game";
 
-function shuffleArray(array: any[]) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-}
-
-function generateFullDeck() {
-  const cards: CardModel[] = [];
-  $enum(Fill).forEach(fill =>
-    $enum(Color).forEach(color =>
-      $enum(Shape).forEach(shape =>
-        $enum(Number).forEach(number =>
-          cards.push(
-            new CardModel({
-              shape,
-              fill,
-              number,
-              color
-            })
-          )
-        )
-      )
-    )
-  );
-  shuffleArray(cards);
-  return cards;
-}
-
-function getAllProductsOf(n: number) {
-  let products: number[][] = [];
-  let a = Math.floor(Math.sqrt(n));
-  let b = Math.ceil(Math.sqrt(n));
-  for (; a >= 1; a--) {
-    for (; a * b < n; b++);
-    products.push([a, b]);
-    products.push([b, a]);
-  }
-  return products;
-}
-
-function bestLayoutFor(n: number, ratio: number) {
-  const products = getAllProductsOf(n);
-  const scoreOfProducts = products.map(([a, b]) =>
-    Math.abs(a / b - ratio || 0)
-  );
-  const bestProductIndex = scoreOfProducts.indexOf(
-    Math.min(...scoreOfProducts)
-  );
-
-  return products[bestProductIndex];
-}
+import { bestLayoutFor } from "./helper";
 
 export default function Deck() {
   const [ref, bounds] = useMeasure();
-  const [deck, setDeck] = useState<CardModel[]>(generateFullDeck());
+  const [force, forceUpdate] = useState(false);
+  const game = useContext(Game);
 
   const ratio = bounds.width / (bounds.height / 1.5);
-  const [cols, rows] = bestLayoutFor(deck.length, ratio);
+  const [cols, rows] = bestLayoutFor(game.deck.length, ratio);
 
   const width = Math.min(
     bounds.width / (cols + (cols - 1) * 0.1),
     bounds.height / (rows * 1.5 + (rows - 1) * 0.1)
   );
 
-  const position: (i: number) => { x: number; y: number } = (i: number) => ({
+  const position: (
+    i: number
+  ) => { x: number; y: number; scale: number; width: number } = (
+    i: number
+  ) => ({
     x: (i % cols) * (width * 1.1),
     y: Math.floor(i / cols) * (width * 1.6),
-    scale: width / 100
+    scale: width / 100,
+    width,
+    z: 1,
   });
 
-  const [props, set] = useSprings(deck.length, i => ({
-    ...position(i),
-    from: { x: 0, y: 0 }
+  const [props, set] = useSprings(game.cards.length, (i) => ({
+    ...position(game.deck.indexOf(i)),
+    from: { x: 0, y: 0, opacity: 0 },
   }));
 
-  useEffect(() => {
-    set(position);
-  }, [width]);
+  const bind = useDrag(({ args: [index], down }) => {
+    if (!down) {
+      game.selectCard(game.cards[index] as CardModel);
+    }
+  });
 
-  return (
-    <div ref={ref} className="deck">
-      {props.map(({ x, y, scale }, i) => {
-        return (
-          <animated.div
-            key={i}
-            className={"cardWrapper"}
-            style={{
-              transform: interpolate(
-                [x, y, scale],
-                (xn, yn, scale) =>
-                  `translate3d(${xn}px, ${yn}px, 0) scale(${scale})`
-              )
-            }}
-          >
-            <Card card={deck[i]} />
-          </animated.div>
-        );
-      })}
-    </div>
+  const update = () => {
+    set((i) => {
+      const active = game.deck.indexOf(i) >= 0;
+      if (!active) return { opacity: 0 };
+      const selected = game.selectedCards.indexOf(i) >= 0;
+      const scale = selected ? 1.2 : 1; // Active cards lift up a bit
+      const z = selected ? 2 : 1;
+      const o = position(game.deck.indexOf(i));
+      return {
+        scale: o.scale * scale,
+        x: o.x - ((scale - 1) * width) / 2,
+        y: o.y - ((scale - 1) * width * 1.5) / 2,
+        z,
+        opacity: 1,
+      };
+    });
+  };
+
+  observe(game.deck, update);
+  observe(
+    game.cards,
+    () => {
+      console.log("cards changed", JSON.stringify(game.cards));
+      //forceUpdate(!force);
+    },
+    false
   );
+  observe(game.selectedCards, update);
+  useEffect(update, [width]);
+
+  return useObserver(() => {
+    return (
+      <div ref={ref} className="deck">
+        {props.map(({ x, y, scale, z, opacity }, i) => {
+          return (
+            <animated.div
+              key={i}
+              className={"cardWrapper"}
+              style={{
+                opacity,
+                transform: interpolate(
+                  [x, y, scale, z],
+                  (xn, yn, scale, z) =>
+                    `translate3d(${xn}px, ${yn}px, ${z}em) scale(${scale})`
+                ),
+                boxShadow: interpolate(
+                  [z],
+                  (z) =>
+                    `0 12.5px ${z * 100 - 50}px -10px rgba(50, 50, 73, 0.4), 
+                    0 10px 10px -10px rgba(50, 50, 73, 0.3)`
+                ),
+              }}
+              {...bind(i)}
+            >
+              <Card card={game.cards[i]} />
+            </animated.div>
+          );
+        })}
+      </div>
+    );
+  });
 }
