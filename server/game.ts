@@ -2,6 +2,8 @@ import Card, { Fill, Color, Shape, Number, isSet } from "../src/Model/Card";
 import { $enum } from "ts-enum-util";
 import { observable, computed, action, decorate } from "mobx";
 
+import { GameStatus } from "../src/common/gameStatus";
+
 const NORMAL_CARD_COUNT = 12;
 
 class Game {
@@ -13,7 +15,7 @@ class Game {
   deck: (number | null)[] = [];
   pile: number[] = [];
   selectedCards: number[] = [];
-  status: string = "LOBBY";
+  status: string = GameStatus.LOBBY;
 
   clickCard(card: number) {
     this.selectedCards.indexOf(card) >= 0
@@ -36,7 +38,7 @@ class Game {
   }
 
   endGame() {
-    this.status = "FINISHED";
+    this.status = GameStatus.FINISHED;
   }
 
   fillDeck() {
@@ -93,12 +95,12 @@ class Game {
   }
 
   startGame() {
-    if (this.status === "STARTED") return;
+    if (this.status === GameStatus.RUNNING) return;
     this.deck.length = 0;
     this.pile = shuffleArray(Array.from(this.cards.keys()));
     observable(this.deck).replace(this.pile.splice(0, NORMAL_CARD_COUNT));
     this.fillDeck();
-    this.status = "STARTED";
+    this.status = GameStatus.RUNNING;
   }
 
   generateFullDeck() {

@@ -2,6 +2,8 @@ import { observable, action, decorate } from "mobx";
 import { createContext } from "react";
 import ReconnectingWebSocket from "reconnecting-websocket";
 import Card from "./Card";
+import { GameStatus } from "../common/gameStatus";
+import { Messages } from "../common/messages";
 
 const SERVER = "ws://localhost:8080";
 
@@ -11,7 +13,7 @@ class Game {
   }
 
   startServer() {
-    const rws = new ReconnectingWebSocket(SERVER, [], { debug: true });
+    const rws = new ReconnectingWebSocket(SERVER, [], { debug: false });
     this.ws = rws;
     rws.addEventListener("open", () => {
       this.connected = true;
@@ -20,21 +22,20 @@ class Game {
 
     rws.addEventListener("message", (event) => {
       const [command, data] = JSON.parse(event.data);
-      console.log(command, data);
       switch (command) {
-        case "all_cards":
+        case Messages.CARDS:
           observable(this.cards).replace(
             (data as Card[]).map((card, i) => new Card(card, i))
           );
           break;
-        case "deck":
+        case Messages.DECK:
           observable(this.deck).replace(data);
           break;
-        case "selectedCards":
+        case Messages.SELECTED_CARDS:
           observable(this.selectedCards).replace(data);
           break;
-        case "status": {
-          this.status = data;
+        case Messages.STATUS: {
+          this.status = data as GameStatus;
         }
         default:
           break;
@@ -52,7 +53,7 @@ class Game {
   cards: Card[] = [];
   deck: (number | null)[] = [];
   selectedCards: number[] = [];
-  status: string = "LOBBY";
+  status: string = GameStatus.LOBBY;
 
   selectCard(i: number) {
     if (!this.ws || !this.connected) return;
@@ -62,12 +63,22 @@ class Game {
     } else {
       this.selectedCards.push(i);
     }
-    this.ws.send(JSON.stringify(["click_card", i]));
+    this.ws.send(JSON.stringify([Messages.CLICK_CARD, i]));
   }
 
   startGame() {
     if (!this.ws || !this.connected) return;
-    this.ws.send(JSON.stringify(["start_game"]));
+    this.ws.send(JSON.stringify([Messages.START_GAME]));
+  }
+
+  createGame() {
+    if (!this.ws || !this.connected) return;
+    this.ws.send(JSON.stringify([Messages.CREATE_GAME]));
+  }
+
+  abortGame() {
+    if (!this.ws || !this.connected) return;
+    this.ws.send(JSON.stringify([Messages.ABORT_GAME]));
   }
 }
 
@@ -79,6 +90,8 @@ decorate(Game, {
   connected: observable,
   selectCard: action,
   startGame: action,
+  abortGame: action,
+  createGame: action,
 });
 
 export default createContext(new Game());

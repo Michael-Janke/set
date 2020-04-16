@@ -4,6 +4,7 @@ import Deck from "./Deck.container";
 import { useObserver } from "mobx-react";
 
 import Game from "../Model/Game";
+import { GameStatus } from "../common/gameStatus";
 
 export default function Main() {
   const game = useContext(Game);
@@ -11,9 +12,14 @@ export default function Main() {
     <div className="main">
       {useObserver(() => (
         <>
-          {game.status === "STARTED" && <Deck />}
-          {game.status === "LOBBY" && (
+          {game.status === GameStatus.RUNNING && <Deck />}
+          {game.status === GameStatus.LOBBY && (
             <button onClick={() => game.startGame()}>Starten</button>
+          )}
+          {game.status === GameStatus.NONE && (
+            <button onClick={() => game.createGame()}>
+              Spiel erstellen oder Joinen
+            </button>
           )}
         </>
       ))}

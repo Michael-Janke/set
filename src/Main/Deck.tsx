@@ -18,7 +18,8 @@ const Deck = ({
   cols: number;
   rows: number;
 }) => {
-  const { cards, selectedCards, deck } = useContext(Game);
+  const game = useContext(Game);
+  const { cards, selectedCards, deck } = game;
 
   const position: (
     i: number
@@ -70,6 +71,7 @@ const Deck = ({
 
   return (
     <>
+      <button onClick={() => game.abortGame()}>Abbrechen</button>
       {props.map(({ x, y, scale, z, opacity }, i) => {
         return (
           <animated.div

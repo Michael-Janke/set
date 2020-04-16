@@ -1,41 +1,73 @@
 import * as ws from "ws";
 import * as express from "express";
-import { reaction, autorun, observe } from "mobx";
+import { autorun } from "mobx";
+import { Messages } from "../src/common/messages";
 
 import Game from "./game";
+import { GameStatus } from "../src/common/gameStatus";
+
+const DEBUG = process.env.NODE_ENV !== "production";
 
 export default function websocket(ws: ws, req: express.Request) {
-  ws.send(JSON.stringify(["all_cards", game.cards]));
+  let game: Game | null = null;
+  let unconnectGame: () => void = () => {};
+
+  ws.send(JSON.stringify([Messages.STATUS, GameStatus.NONE]));
 
   ws.on("message", function (msg) {
-    const [command, data] = JSON.parse(msg as string);
+    let command: string = "";
+    let data: any;
+    try {
+      [command, data] = JSON.parse(msg as string);
+    } catch (e) {
+      console.error(e);
+    }
+
     switch (command) {
-      case "click_card":
-        game.clickCard(data);
+      case Messages.CLICK_CARD:
+        DEBUG &&
+          console.log("[received]:", "click", data, game && game.cards[data]);
+        game && game.clickCard(data);
+
         break;
-      case "start_game":
-        game.startGame();
+      case Messages.START_GAME:
+        DEBUG && console.log("[received]:", "game start request");
+        game && game.startGame();
+        break;
+      case Messages.CREATE_GAME:
+        DEBUG && console.log("[received]:", "game create request");
+        game = game || new Game();
+        unconnectGame = connectToGame(ws, game);
+
+        break;
+      case Messages.ABORT_GAME:
+        DEBUG && console.log("[received]:", "abort game");
+        game = null;
+        unconnectGame();
+        ws.send(JSON.stringify([Messages.STATUS, GameStatus.NONE]));
         break;
     }
   });
-
-  const dispose1 = autorun((event) => {
-    ws.send(JSON.stringify(["deck", game.deck]));
-  });
-
-  const dispose2 = autorun((event) => {
-    ws.send(JSON.stringify(["selectedCards", game.selectedCards]));
-  });
-
-  const dispose3 = autorun((event) => {
-    ws.send(JSON.stringify(["status", game.status]));
-  });
-
-  ws.on("close", () => {
-    dispose1();
-    dispose2();
-    dispose3();
-  });
 }
 
-const game = new Game();
+const connectToGame = (ws: ws, game: Game) => {
+  const connect: { [key in Messages]?: keyof Game } = {
+    [Messages.DECK]: "deck",
+    [Messages.CARDS]: "cards",
+    [Messages.SELECTED_CARDS]: "selectedCards",
+    [Messages.STATUS]: "status",
+  };
+
+  const disposer = Object.entries(connect).map(([message, key]) =>
+    autorun((event) => {
+      DEBUG && console.log("[send]:", message, game[key as keyof Game]);
+      ws.send(JSON.stringify([message, game[key as keyof Game]]));
+    })
+  );
+
+  ws.on("close", () => {
+    disposer.forEach((dispose) => dispose());
+  });
+
+  return () => disposer.forEach((dispose) => dispose());
+};
