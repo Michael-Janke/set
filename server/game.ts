@@ -13,6 +13,7 @@ class Game {
   deck: (number | null)[] = [];
   pile: number[] = [];
   selectedCards: number[] = [];
+  status: string = "LOBBY";
 
   clickCard(card: number) {
     this.selectedCards.indexOf(card) >= 0
@@ -35,7 +36,7 @@ class Game {
   }
 
   endGame() {
-    console.log("finished");
+    this.status = "FINISHED";
   }
 
   fillDeck() {
@@ -48,11 +49,10 @@ class Game {
     const fill = NORMAL_CARD_COUNT - cardsOnDeck.length;
     if (fill > 0)
       for (let i = 0; i < fill; i++) {
-        this.deck.push(this.pile.pop() || null);
+        this.pile.length && this.deck.push(this.pile.pop() || null);
       }
 
     this.checkExtraCards();
-
     //if there are extra cards and free spaces, consolidate them
     if (
       this.deck.length > cardsOnDeck.length &&
@@ -68,15 +68,14 @@ class Game {
       if (this.deck.indexOf(null) >= 0)
         this.deck.length = this.deck.indexOf(null);
     }
-    console.log(this.deck);
   }
 
   checkExtraCards() {
     const deckContainsSet = this.deckContainsSet();
     if (!deckContainsSet) {
-      this.deck.push(this.pile.pop() as number);
-      this.deck.push(this.pile.pop() as number);
-      this.deck.push(this.pile.pop() as number);
+      this.pile.length && this.deck.push(this.pile.pop() as number);
+      this.pile.length && this.deck.push(this.pile.pop() as number);
+      this.pile.length && this.deck.push(this.pile.pop() as number);
       this.checkExtraCards();
     }
   }
@@ -94,10 +93,12 @@ class Game {
   }
 
   startGame() {
+    if (this.status === "STARTED") return;
     this.deck.length = 0;
     this.pile = shuffleArray(Array.from(this.cards.keys()));
     observable(this.deck).replace(this.pile.splice(0, NORMAL_CARD_COUNT));
     this.fillDeck();
+    this.status = "STARTED";
   }
 
   generateFullDeck() {
@@ -130,6 +131,7 @@ decorate(Game, {
   cards: observable,
   deck: observable,
   selectedCards: observable,
+  status: observable,
   clickCard: action,
   startGame: action,
 });

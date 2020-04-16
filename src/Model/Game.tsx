@@ -23,7 +23,9 @@ class Game {
       console.log(command, data);
       switch (command) {
         case "all_cards":
-          this.setCards(data);
+          observable(this.cards).replace(
+            (data as Card[]).map((card, i) => new Card(card, i))
+          );
           break;
         case "deck":
           observable(this.deck).replace(data);
@@ -31,6 +33,9 @@ class Game {
         case "selectedCards":
           observable(this.selectedCards).replace(data);
           break;
+        case "status": {
+          this.status = data;
+        }
         default:
           break;
       }
@@ -47,34 +52,33 @@ class Game {
   cards: Card[] = [];
   deck: (number | null)[] = [];
   selectedCards: number[] = [];
+  status: string = "LOBBY";
 
-  selectCard(card: Card) {
+  selectCard(i: number) {
     if (!this.ws || !this.connected) return;
-    this.selectedCards.push(card.id);
-    this.ws.send(JSON.stringify(["click_card", card.id]));
+    const selectedCardId = this.selectedCards.indexOf(i);
+    if (selectedCardId >= 0) {
+      this.selectedCards.splice(selectedCardId, 1);
+    } else {
+      this.selectedCards.push(i);
+    }
+    this.ws.send(JSON.stringify(["click_card", i]));
   }
 
-  setCards(data: Card[]) {
-    observable(this.cards).replace(data.map((card, i) => new Card(card, i)));
+  startGame() {
+    if (!this.ws || !this.connected) return;
+    this.ws.send(JSON.stringify(["start_game"]));
   }
-
-  addCard(card: Card) {}
-
-  removeCard(card: Card) {}
-
-  startGame() {}
 }
 
 decorate(Game, {
   cards: observable,
   deck: observable,
   selectedCards: observable,
+  status: observable,
   connected: observable,
-  addCard: action,
-  removeCard: action,
-  startGame: action,
   selectCard: action,
-  setCards: action,
+  startGame: action,
 });
 
 export default createContext(new Game());

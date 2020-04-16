@@ -6,13 +6,16 @@ import Game from "./game";
 
 export default function websocket(ws: ws, req: express.Request) {
   ws.send(JSON.stringify(["all_cards", game.cards]));
-  ws.send(JSON.stringify(["deck", game.deck]));
+
   ws.on("message", function (msg) {
     const [command, data] = JSON.parse(msg as string);
     switch (command) {
-      case "click_card": {
+      case "click_card":
         game.clickCard(data);
-      }
+        break;
+      case "start_game":
+        game.startGame();
+        break;
     }
   });
 
@@ -24,11 +27,15 @@ export default function websocket(ws: ws, req: express.Request) {
     ws.send(JSON.stringify(["selectedCards", game.selectedCards]));
   });
 
+  const dispose3 = autorun((event) => {
+    ws.send(JSON.stringify(["status", game.status]));
+  });
+
   ws.on("close", () => {
     dispose1();
     dispose2();
+    dispose3();
   });
 }
 
 const game = new Game();
-game.startGame();
