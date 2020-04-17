@@ -44,6 +44,7 @@ class User {
       [Messages.CARDS]: "cards",
       [Messages.SELECTED_CARDS]: "selectedCards",
       [Messages.STATUS]: "status",
+      [Messages.GAME_ID]: "id",
     };
 
     this.disposer = Object.entries(connect).map(([message, key]) =>

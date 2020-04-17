@@ -4,3 +4,6 @@ export enum GameStatus {
   RUNNING = "RUNNING",
   FINISHED = "FINISHED",
 }
+
+export const GAME_ID_CHARACTERS = "ABCDEFGHIJKLMNPQRSTUVWXYZ123456789";
+export const GAME_ID_LENGTH = 4;

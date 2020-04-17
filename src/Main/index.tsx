@@ -1,13 +1,15 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import "./index.css";
 import Deck from "../components/Deck";
 import { useObserver } from "mobx-react";
 
 import Game from "../Model/Game";
 import { GameStatus } from "../common/gameStatus";
+import CreateOrJoinGame from "./CreateOrJoinGame";
 
 export default function Main() {
   const game = useContext(Game);
+
   return (
     <div className="main">
       {useObserver(() => (
@@ -16,7 +18,7 @@ export default function Main() {
           {game.status === GameStatus.LOBBY && (
             <button onClick={() => game.startGame()}>Starten</button>
           )}
-          {game.status === GameStatus.NONE && (
+          {game.status === "test" && (
             <>
               <input
                 value={game.userName}
@@ -26,6 +28,12 @@ export default function Main() {
                 Spiel erstellen oder Joinen
               </button>
             </>
+          )}
+          {game.status === GameStatus.NONE && (
+            <CreateOrJoinGame
+              onCreate={() => game.createGame()}
+              onJoin={(code) => game.joinGame(code)}
+            />
           )}
         </>
       ))}

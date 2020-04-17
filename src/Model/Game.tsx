@@ -3,7 +3,7 @@ import { createContext } from "react";
 import ReconnectingWebSocket from "reconnecting-websocket";
 import Card from "./Card";
 import { GameStatus } from "../common/gameStatus";
-import { Messages } from "../common/messages";
+import { Messages, ErrorMessages } from "../common/messages";
 
 const SERVER = "ws://localhost:8080";
 
@@ -39,18 +39,35 @@ class Game {
             (data as Card[]).map((card, i) => new Card(card, i))
           );
           break;
+
         case Messages.DECK:
           observable(this.deck).replace(data);
           break;
+
         case Messages.SELECTED_CARDS:
           observable(this.selectedCards).replace(data);
           break;
-        case Messages.STATUS: {
+
+        case Messages.STATUS:
           this.status = data as GameStatus;
-        }
-        case Messages.USER_NAME: {
+          break;
+
+        case Messages.USER_NAME:
           this.userName = data;
-        }
+          break;
+
+        case Messages.GAME_ID:
+          this.gameId = data;
+          window.location.hash = data;
+          break;
+
+        case Messages.ERROR:
+          this.error = data;
+          window.setTimeout(() => {
+            if (this.error === data) this.error = undefined;
+          }, 5000);
+          break;
+
         default:
           break;
       }
@@ -71,6 +88,8 @@ class Game {
 
   userId: string | undefined;
   userName: string = "";
+  gameId: string | undefined;
+  error: ErrorMessages | undefined;
 
   selectCard(i: number) {
     if (!this.ws || !this.connected) return;
@@ -98,6 +117,11 @@ class Game {
     this.ws.send(JSON.stringify([Messages.ABORT_GAME]));
   }
 
+  joinGame(code: string) {
+    if (!this.ws || !this.connected) return;
+    this.ws.send(JSON.stringify([Messages.JOIN_GAME, code]));
+  }
+
   setName(name: string) {
     if (!this.ws || !this.connected) return;
     this.ws.send(JSON.stringify([Messages.USER_NAME, name]));
@@ -115,8 +139,10 @@ decorate(Game, {
   selectCard: action,
   startGame: action,
   abortGame: action,
+  joinGame: action,
   createGame: action,
   setName: action,
+  error: observable,
 });
 
 export default createContext(new Game());

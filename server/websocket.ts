@@ -1,10 +1,14 @@
 import * as ws from "ws";
 import * as express from "express";
 
-import { Messages } from "../src/common/messages";
+import { Messages, ErrorMessages } from "../src/common/messages";
 
 import Game, { GameId } from "./game";
-import { GameStatus } from "../src/common/gameStatus";
+import {
+  GameStatus,
+  GAME_ID_CHARACTERS,
+  GAME_ID_LENGTH,
+} from "../src/common/gameStatus";
 
 import Matching from "./matching";
 import User, { UserId } from "./user";
@@ -61,6 +65,15 @@ export default function websocket(ws: ws, req: express.Request) {
         matching.joinGame(user.id, newGame);
         DEBUG && console.log("[created]:", "game", newGame.id);
         break;
+      case Messages.JOIN_GAME:
+        DEBUG && console.log("[received]:", "game create request");
+        const reqGame = matching.games.get(data);
+        if (reqGame) {
+          matching.joinGame(user.id, reqGame);
+        } else {
+          user.send(Messages.ERROR, ErrorMessages.GAME_NOT_EXIST);
+        }
+        break;
       case Messages.ABORT_GAME:
         DEBUG && console.log("[received]:", "abort game");
         if (!game) break;
@@ -80,12 +93,12 @@ export default function websocket(ws: ws, req: express.Request) {
 const makeGameId = () => {
   let newId: GameId;
   do {
-    newId = makeid(4);
+    newId = makeid(GAME_ID_LENGTH);
   } while (matching.games.has(newId));
   return newId;
   function makeid(length: number) {
     var result = "";
-    var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
+    var characters = GAME_ID_CHARACTERS;
     var charactersLength = characters.length;
     for (var i = 0; i < length; i++) {
       result += characters.charAt(Math.floor(Math.random() * charactersLength));

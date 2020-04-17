@@ -21,6 +21,7 @@
     "mobx": "^5.15.4",
     "mobx-react": "^6.2.2",
     "mobx-react-lite": "^2.0.6",
+    "node-sass": "^4.13.1",
     "node-ts": "^5.0.3",
     "nodemon": "^1.19.4",
     "prop-types": "^15.7.2",
