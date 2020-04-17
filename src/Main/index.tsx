@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import "./index.css";
-import Deck from "./Deck.container";
+import Deck from "../components/Deck";
 import { useObserver } from "mobx-react";
 
 import Game from "../Model/Game";
@@ -17,9 +17,15 @@ export default function Main() {
             <button onClick={() => game.startGame()}>Starten</button>
           )}
           {game.status === GameStatus.NONE && (
-            <button onClick={() => game.createGame()}>
-              Spiel erstellen oder Joinen
-            </button>
+            <>
+              <input
+                value={game.userName}
+                onChange={(event) => game.setName(event.target.value)}
+              />
+              <button onClick={() => game.createGame()}>
+                Spiel erstellen oder Joinen
+              </button>
+            </>
           )}
         </>
       ))}

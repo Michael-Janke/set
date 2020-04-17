@@ -5,8 +5,8 @@ import { useObserver, observer } from "mobx-react";
 import { autorun, reaction, observe, IObjectDidChange } from "mobx";
 
 import "./Deck.css";
-import Card from "./Card";
-import Game from "../Model/Game";
+import Card from "../Card";
+import Game from "../../Model/Game";
 
 const Deck = ({
   onSelect,

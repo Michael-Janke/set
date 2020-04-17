@@ -3,7 +3,7 @@ import React from "react";
 import "./Card.css";
 import { createUseStyles } from "react-jss";
 import ShapeSvg from "./Shape";
-import CardModel from "../Model/Card";
+import CardModel from "../../Model/Card";
 
 interface CardProps extends React.PropsWithChildren<any> {
   card: CardModel;
@@ -28,9 +28,9 @@ const useStyles = createUseStyles({
     padding: "10%",
     transform: "translateZ(1px)",
     "& svg": {
-      width: "100%"
-    }
-  }
+      width: "100%",
+    },
+  },
 });
 
 const Card = ({ card }: CardProps) => {

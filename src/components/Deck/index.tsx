@@ -3,7 +3,7 @@ import useMeasure from "react-use-measure";
 import { observer, Observer } from "mobx-react";
 import { reaction } from "mobx";
 
-import Game from "../Model/Game";
+import Game from "../../Model/Game";
 import Deck from "./Deck";
 import { bestLayoutFor } from "./helper";
 

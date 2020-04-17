@@ -1,4 +1,4 @@
-import { Shape, Color, Fill } from "../Model/Card";
+import { Shape, Color, Fill } from "../../Model/Card";
 import React from "react";
 
 interface ShapeSvgProps {
@@ -8,7 +8,7 @@ interface ShapeSvgProps {
 }
 
 const CrossHatch = ({
-  color
+  color,
 }: {
   color: React.SVGAttributes<SVGLineElement>["stroke"];
 }) => (
@@ -32,18 +32,18 @@ export default function ShapeSvg({ shape, color, fill }: ShapeSvgProps) {
     [Shape.Round]:
       "m9.630955,0l40.602444,0l0,0c5.319036,0 9.630956,4.380615 9.630956,9.784376c0,5.403758 -4.311922,9.784372 -9.630956,9.784372l-40.602444,0l0,0c-5.31903,0 -9.630956,-4.380613 -9.630956,-9.784372c0,-5.403762 4.311926,-9.784376 9.630956,-9.784376z",
     [Shape.Square]:
-      "m0,10.706962l29.905627,-10.706964l29.905697,10.706964l-29.905697,10.706964l-29.905627,-10.706964z"
+      "m0,10.706962l29.905627,-10.706964l29.905697,10.706964l-29.905697,10.706964l-29.905627,-10.706964z",
   };
   const path = paths[shape];
   const colors: { [x in Color]: string } = {
     [Color.Green]: "#2e7d32",
     [Color.Purple]: "#5e35b1",
-    [Color.Red]: "#c62828"
+    [Color.Red]: "#c62828",
   };
   const fills: { [x in Color]: string | undefined } = {
     [Fill.Dotted]: "url(#pattern" + colors[color] + ") " + colors[color],
     [Fill.Filled]: colors[color],
-    [Fill.None]: undefined
+    [Fill.None]: undefined,
   };
   return (
     <svg width="200" viewBox="-5 -5 70 30">

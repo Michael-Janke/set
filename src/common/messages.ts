@@ -7,4 +7,8 @@ export enum Messages {
   START_GAME = "startGame",
   CREATE_GAME = "createGame",
   ABORT_GAME = "abortGame",
+  USER_ID = "userId",
+  ERROR = "error",
+  GAME_ID = "gameId",
+  USER_NAME = "userName",
 }

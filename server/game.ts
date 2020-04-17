@@ -1,13 +1,17 @@
 import Card, { Fill, Color, Shape, Number, isSet } from "../src/Model/Card";
 import { $enum } from "ts-enum-util";
-import { observable, computed, action, decorate } from "mobx";
+import { observable, action, decorate } from "mobx";
 
 import { GameStatus } from "../src/common/gameStatus";
+import { UserId } from "./matching";
+
+export type GameId = string;
 
 const NORMAL_CARD_COUNT = 12;
 
 class Game {
-  constructor() {
+  constructor(id: GameId) {
+    this.id = id;
     this.generateFullDeck();
   }
 
@@ -16,6 +20,17 @@ class Game {
   pile: number[] = [];
   selectedCards: number[] = [];
   status: string = GameStatus.LOBBY;
+  id: GameId;
+
+  players: Set<UserId> = new Set();
+
+  join(userId: UserId) {
+    this.players.add(userId);
+  }
+
+  leave(userId: UserId) {
+    this.players.delete(userId);
+  }
 
   clickCard(card: number) {
     this.selectedCards.indexOf(card) >= 0
@@ -134,8 +149,10 @@ decorate(Game, {
   deck: observable,
   selectedCards: observable,
   status: observable,
+  players: observable,
   clickCard: action,
   startGame: action,
+  endGame: action,
 });
 
 export default Game;

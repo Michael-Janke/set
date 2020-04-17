@@ -1,20 +1,22 @@
 import * as ws from "ws";
 import * as express from "express";
-import { autorun } from "mobx";
+
 import { Messages } from "../src/common/messages";
 
-import Game from "./game";
+import Game, { GameId } from "./game";
 import { GameStatus } from "../src/common/gameStatus";
 
-const DEBUG = process.env.NODE_ENV !== "production";
+import Matching from "./matching";
+import User, { UserId } from "./user";
+import { DEBUG } from ".";
+
+const matching = new Matching();
 
 export default function websocket(ws: ws, req: express.Request) {
-  let game: Game | null = null;
-  let unconnectGame: () => void = () => {};
-
+  let user: User | null = null;
   ws.send(JSON.stringify([Messages.STATUS, GameStatus.NONE]));
 
-  ws.on("message", function (msg) {
+  ws.on("message", (msg) => {
     let command: string = "";
     let data: any;
     try {
@@ -23,12 +25,30 @@ export default function websocket(ws: ws, req: express.Request) {
       console.error(e);
     }
 
+    //userId guard
+    if (user === null) {
+      if (command === Messages.USER_ID) {
+        DEBUG && console.log("[received]:", "userId", data);
+        const userId = data as UserId;
+        user = matching.users.get(userId) || new User(userId);
+        user.registerSocket(ws);
+        matching.registerUser(user);
+      } else {
+        ws.send(JSON.stringify([Messages.ERROR, "No Initial UserID"]));
+        ws.close();
+        return;
+      }
+    }
+
+    const game = matching.getCurrentGame(user.id);
+
     switch (command) {
+      case Messages.USER_ID:
+        break;
       case Messages.CLICK_CARD:
         DEBUG &&
           console.log("[received]:", "click", data, game && game.cards[data]);
         game && game.clickCard(data);
-
         break;
       case Messages.START_GAME:
         DEBUG && console.log("[received]:", "game start request");
@@ -36,38 +56,40 @@ export default function websocket(ws: ws, req: express.Request) {
         break;
       case Messages.CREATE_GAME:
         DEBUG && console.log("[received]:", "game create request");
-        game = game || new Game();
-        unconnectGame = connectToGame(ws, game);
-
+        const newGame = new Game(makeGameId());
+        matching.createGame(newGame);
+        matching.joinGame(user.id, newGame);
+        DEBUG && console.log("[created]:", "game", newGame.id);
         break;
       case Messages.ABORT_GAME:
         DEBUG && console.log("[received]:", "abort game");
-        game = null;
-        unconnectGame();
-        ws.send(JSON.stringify([Messages.STATUS, GameStatus.NONE]));
+        if (!game) break;
+        matching.abortGame(game);
         break;
+      case Messages.USER_NAME:
+        DEBUG && console.log("[received]:", "new user name", data);
+        user.name = data;
+        break;
+
+      default:
+        console.warn("[received]:", "unhandled message", msg);
     }
   });
 }
 
-const connectToGame = (ws: ws, game: Game) => {
-  const connect: { [key in Messages]?: keyof Game } = {
-    [Messages.DECK]: "deck",
-    [Messages.CARDS]: "cards",
-    [Messages.SELECTED_CARDS]: "selectedCards",
-    [Messages.STATUS]: "status",
-  };
-
-  const disposer = Object.entries(connect).map(([message, key]) =>
-    autorun((event) => {
-      DEBUG && console.log("[send]:", message, game[key as keyof Game]);
-      ws.send(JSON.stringify([message, game[key as keyof Game]]));
-    })
-  );
-
-  ws.on("close", () => {
-    disposer.forEach((dispose) => dispose());
-  });
-
-  return () => disposer.forEach((dispose) => dispose());
+const makeGameId = () => {
+  let newId: GameId;
+  do {
+    newId = makeid(4);
+  } while (matching.games.has(newId));
+  return newId;
+  function makeid(length: number) {
+    var result = "";
+    var characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  }
 };

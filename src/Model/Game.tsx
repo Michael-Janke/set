@@ -9,15 +9,26 @@ const SERVER = "ws://localhost:8080";
 
 class Game {
   constructor() {
+    this.setUserId();
     this.startServer();
+  }
+  setUserId() {
+    const userId = localStorage.getItem("userId");
+    if (userId !== null) {
+      this.userId = userId;
+    } else {
+      this.userId = uuidv4();
+      localStorage.setItem("userId", this.userId);
+    }
   }
 
   startServer() {
+    if (this.userId === undefined) throw new Error("no userID");
     const rws = new ReconnectingWebSocket(SERVER, [], { debug: false });
     this.ws = rws;
     rws.addEventListener("open", () => {
       this.connected = true;
-      rws.send(JSON.stringify(["hello"]));
+      rws.send(JSON.stringify([Messages.USER_ID, this.userId]));
     });
 
     rws.addEventListener("message", (event) => {
@@ -37,6 +48,9 @@ class Game {
         case Messages.STATUS: {
           this.status = data as GameStatus;
         }
+        case Messages.USER_NAME: {
+          this.userName = data;
+        }
         default:
           break;
       }
@@ -54,6 +68,9 @@ class Game {
   deck: (number | null)[] = [];
   selectedCards: number[] = [];
   status: string = GameStatus.LOBBY;
+
+  userId: string | undefined;
+  userName: string = "";
 
   selectCard(i: number) {
     if (!this.ws || !this.connected) return;
@@ -80,6 +97,12 @@ class Game {
     if (!this.ws || !this.connected) return;
     this.ws.send(JSON.stringify([Messages.ABORT_GAME]));
   }
+
+  setName(name: string) {
+    if (!this.ws || !this.connected) return;
+    this.ws.send(JSON.stringify([Messages.USER_NAME, name]));
+    this.userName = name;
+  }
 }
 
 decorate(Game, {
@@ -88,10 +111,20 @@ decorate(Game, {
   selectedCards: observable,
   status: observable,
   connected: observable,
+  userName: observable,
   selectCard: action,
   startGame: action,
   abortGame: action,
   createGame: action,
+  setName: action,
 });
 
 export default createContext(new Game());
+
+function uuidv4() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}

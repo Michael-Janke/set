@@ -6,6 +6,8 @@ let appBase = express();
 let wsInstance = expressWs(appBase);
 let { app } = wsInstance;
 
+export const DEBUG = process.env.NODE_ENV !== "production";
+
 app.use(express.static("../build"));
 
 app.ws("/", websocket);
