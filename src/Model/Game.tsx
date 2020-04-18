@@ -4,6 +4,7 @@ import ReconnectingWebSocket from "reconnecting-websocket";
 import Card from "./Card";
 import { GameStatus } from "../common/gameStatus";
 import { Messages, ErrorMessages } from "../common/messages";
+import { observer } from "mobx-react-lite";
 
 const SERVER = "ws://localhost:8080";
 
@@ -61,6 +62,14 @@ class Game {
           window.location.hash = data;
           break;
 
+        case Messages.PLAYERS:
+          observable(this.players).replace(data);
+          break;
+
+        case Messages.READY:
+          this.ready = !!data;
+          break;
+
         case Messages.ERROR:
           this.error = data;
           window.setTimeout(() => {
@@ -90,6 +99,15 @@ class Game {
   userName: string = "";
   gameId: string | undefined;
   error: ErrorMessages | undefined;
+
+  ready: boolean = false;
+
+  players: {
+    name: string;
+    id: string;
+    ready: boolean;
+    score: { sets: number };
+  }[] = [];
 
   selectCard(i: number) {
     if (!this.ws || !this.connected) return;
@@ -127,6 +145,11 @@ class Game {
     this.ws.send(JSON.stringify([Messages.USER_NAME, name]));
     this.userName = name;
   }
+
+  setReadiness(ready: boolean) {
+    if (!this.ws || !this.connected) return;
+    this.ws.send(JSON.stringify([Messages.SET_READINESS, ready]));
+  }
 }
 
 decorate(Game, {
@@ -143,6 +166,10 @@ decorate(Game, {
   createGame: action,
   setName: action,
   error: observable,
+  gameId: observable,
+  players: observable,
+  setReadiness: action,
+  ready: observable,
 });
 
 export default createContext(new Game());

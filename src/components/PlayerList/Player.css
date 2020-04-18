@@ -1,0 +1,46 @@
+.players {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: fit-content;
+  margin: auto;
+}
+
+.player-container {
+  height: 100px;
+}
+
+.player {
+  overflow: hidden;
+  pointer-events: auto;
+  transform-origin: 50% 50% 0px;
+  border-radius: 5px;
+  color: white;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  box-sizing: border-box;
+  margin: 10px;
+}
+
+.name-container .ready-icon {
+  font-size: 0.5em;
+}
+
+.name-container .ready-icon > span {
+  background-color: white;
+}
+
+.name-container .name {
+  padding-bottom: 0.2em;
+}
+
+.name-container {
+  font-size: 1em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}

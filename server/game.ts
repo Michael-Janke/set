@@ -1,17 +1,20 @@
 import Card, { Fill, Color, Shape, Number, isSet } from "../src/Model/Card";
 import { $enum } from "ts-enum-util";
-import { observable, action, decorate } from "mobx";
+import { observable, action, decorate, computed } from "mobx";
 
 import { GameStatus } from "../src/common/gameStatus";
 import { UserId } from "./matching";
+import User from "./user";
+import { Messages, ErrorMessages } from "../src/common/messages";
 
 export type GameId = string;
 
 const NORMAL_CARD_COUNT = 12;
 
 class Game {
-  constructor(id: GameId) {
+  constructor(id: GameId, owner: User) {
     this.id = id;
+    this.owner = owner;
     this.generateFullDeck();
   }
 
@@ -21,26 +24,49 @@ class Game {
   selectedCards: number[] = [];
   status: string = GameStatus.LOBBY;
   id: GameId;
+  owner: User;
 
-  players: Set<UserId> = new Set();
+  players: Set<User> = new Set();
+  statistics: Map<User, { sets: number }> = new Map();
 
-  join(userId: UserId) {
-    this.players.add(userId);
+  join(user: User) {
+    this.players.add(user);
+    this.statistics.set(user, { sets: 0 });
   }
 
-  leave(userId: UserId) {
-    this.players.delete(userId);
+  leave(user: User) {
+    this.players.delete(user);
+    this.statistics.delete(user);
   }
 
-  clickCard(card: number) {
+  get playerList() {
+    return Array.from(this.players).map((user) => ({
+      name: user.name,
+      id: user.publicId,
+      ready: user.ready,
+      score: this.statistics.get(user),
+      owner: user === this.owner,
+    }));
+  }
+
+  clickCard(card: number, user: User) {
+    if (!this.players.has(user))
+      return user.send(Messages.ERROR, ErrorMessages.PERMISSION_DENIED);
     this.selectedCards.indexOf(card) >= 0
       ? this.selectedCards.splice(this.selectedCards.indexOf(card), 1)
       : this.selectedCards.push(card);
-    this.checkSet();
+
+    const isSet = this.checkSet();
+
+    if (isSet) {
+      const stats = this.statistics.get(user);
+      stats && stats.sets++;
+    }
   }
 
   checkSet() {
     if (this.selectedCards.length !== 3) return;
+    let set = false;
     const selectedCards = this.selectedCards.map((id) => this.cards[id]);
     if (isSet(selectedCards[0], selectedCards[1], selectedCards[2])) {
       this.selectedCards.forEach((card) => {
@@ -48,8 +74,10 @@ class Game {
         this.deck[i] = null;
       });
       this.fillDeck();
+      set = true;
     }
     this.selectedCards.length = 0;
+    return set;
   }
 
   endGame() {
@@ -64,26 +92,21 @@ class Game {
 
     //fill deck with new cards upto 12
     const fill = NORMAL_CARD_COUNT - cardsOnDeck.length;
-    if (fill > 0)
-      for (let i = 0; i < fill; i++) {
-        this.pile.length && this.deck.push(this.pile.pop() || null);
-      }
+    for (let i = 0; i < fill; i++) {
+      this.pile.length > 0 && this.deck.push(this.pile.pop() as number);
+    }
 
     this.checkExtraCards();
+
     //if there are extra cards and free spaces, consolidate them
-    if (
-      this.deck.length > cardsOnDeck.length &&
-      this.deck.length > NORMAL_CARD_COUNT
-    ) {
+    if (this.deck.indexOf(null) >= 0 && this.deck.length > NORMAL_CARD_COUNT) {
       for (let i = this.deck.length - 1; i >= NORMAL_CARD_COUNT; i--) {
         const nextFreeSpace = this.deck.indexOf(null);
         if (nextFreeSpace >= 0) {
-          this.deck[nextFreeSpace] = this.deck.pop() || null;
+          const lastCard = this.deck.pop();
+          if (lastCard !== undefined) this.deck[nextFreeSpace] = lastCard;
         }
       }
-
-      if (this.deck.indexOf(null) >= 0)
-        this.deck.length = this.deck.indexOf(null);
     }
   }
 
@@ -109,12 +132,18 @@ class Game {
     );
   }
 
-  startGame() {
+  startGame(user: User) {
     if (this.status === GameStatus.RUNNING) return;
+    if (!Array.from(this.players).every((user) => user.ready)) {
+      this.players.forEach((user) =>
+        user.send(Messages.ERROR, ErrorMessages.NOT_ALL_PLAYERS_READY)
+      );
+      return;
+    }
     this.deck.length = 0;
     this.pile = shuffleArray(Array.from(this.cards.keys()));
-    observable(this.deck).replace(this.pile.splice(0, NORMAL_CARD_COUNT));
     this.fillDeck();
+    this.statistics.forEach((ref) => (ref.sets = 0));
     this.status = GameStatus.RUNNING;
   }
 
@@ -150,9 +179,11 @@ decorate(Game, {
   selectedCards: observable,
   status: observable,
   players: observable,
+  statistics: observable,
   clickCard: action,
   startGame: action,
   endGame: action,
+  playerList: computed,
 });
 
 export default Game;

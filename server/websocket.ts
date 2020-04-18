@@ -52,15 +52,15 @@ export default function websocket(ws: ws, req: express.Request) {
       case Messages.CLICK_CARD:
         DEBUG &&
           console.log("[received]:", "click", data, game && game.cards[data]);
-        game && game.clickCard(data);
+        game && game.clickCard(data, user);
         break;
       case Messages.START_GAME:
         DEBUG && console.log("[received]:", "game start request");
-        game && game.startGame();
+        game && game.startGame(user);
         break;
       case Messages.CREATE_GAME:
         DEBUG && console.log("[received]:", "game create request");
-        const newGame = new Game(makeGameId());
+        const newGame = new Game(makeGameId(), user);
         matching.createGame(newGame);
         matching.joinGame(user.id, newGame);
         DEBUG && console.log("[created]:", "game", newGame.id);
@@ -82,6 +82,15 @@ export default function websocket(ws: ws, req: express.Request) {
       case Messages.USER_NAME:
         DEBUG && console.log("[received]:", "new user name", data);
         user.name = data;
+        break;
+      case Messages.SET_READINESS:
+        DEBUG &&
+          console.log(
+            "[received]:",
+            user.name,
+            ["is not ready anymore", "is ready"][data ? 1 : 0]
+          );
+        user.ready = data;
         break;
 
       default:

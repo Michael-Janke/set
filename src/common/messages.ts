@@ -12,10 +12,15 @@ export enum Messages {
   ERROR = "error",
   GAME_ID = "gameId",
   USER_NAME = "userName",
+  PLAYERS = "players",
+  SET_READINESS = "setReadiness",
+  READY = "ready",
 }
 
 export enum ErrorMessages {
   GAME_NOT_EXIST = "GAME_NOT_EXIST",
+  PERMISSION_DENIED = "PERMISSION_DENIED",
+  NOT_ALL_PLAYERS_READY = "NOT_ALL_PLAYERS_READY",
 }
 
 export const ErrorText: {
@@ -23,5 +28,7 @@ export const ErrorText: {
 } = {
   de: {
     GAME_NOT_EXIST: "Das Spiel existiert nicht",
+    PERMISSION_DENIED: "Fehlende Berechtigung",
+    NOT_ALL_PLAYERS_READY: "Nicht alle Spieler sind bereit",
   },
 };

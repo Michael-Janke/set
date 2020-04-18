@@ -17,15 +17,19 @@ class User {
   sockets: Set<ws> = new Set();
   name: string;
   id: UserId;
+  publicId: string = new Date().getTime().toString();
   disposer: IReactionDisposer[] = [];
+  ready: boolean = false;
 
   registerSocket(ws: ws) {
     this.sockets.add(ws);
     const dispose = autorun(() => this.send(Messages.USER_NAME, this.name));
+    const dispose2 = autorun(() => this.send(Messages.READY, this.ready));
 
     ws.on("close", () => {
       this.sockets.delete(ws);
       dispose();
+      dispose2();
     });
   }
 
@@ -35,6 +39,7 @@ class User {
 
   disconnectFromGame() {
     this.disposer.forEach((dispose) => dispose());
+    this.ready = false;
   }
 
   connectToGame(game: Game) {
@@ -45,6 +50,7 @@ class User {
       [Messages.SELECTED_CARDS]: "selectedCards",
       [Messages.STATUS]: "status",
       [Messages.GAME_ID]: "id",
+      [Messages.PLAYERS]: "playerList",
     };
 
     this.disposer = Object.entries(connect).map(([message, key]) =>
@@ -67,6 +73,7 @@ class User {
 
 decorate(User, {
   name: observable,
+  ready: observable,
 });
 
 export default User;

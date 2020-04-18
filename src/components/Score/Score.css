@@ -1,0 +1,9 @@
+.score {
+  position: relative;
+  margin: 15px;
+  height: 30px;
+}
+.score .number {
+  position: absolute;
+  font-weight: bolder;
+}

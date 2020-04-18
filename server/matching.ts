@@ -30,20 +30,22 @@ class Matching {
 
   joinGame(userId: UserId, game: Game) {
     this.matching.set(userId, game);
-    game.join(userId);
-    this.users.get(userId)?.connectToGame(game);
+    const user = this.users.get(userId);
+    user && game.join(user);
+    user?.connectToGame(game);
   }
 
   leaveGame(userId: UserId) {
-    this.matching.get(userId)?.leave(userId);
-    this.matching.delete(userId);
     const user = this.users.get(userId);
-    user?.disconnectFromGame();
-    user?.send(Messages.STATUS, GameStatus.NONE);
+    if (!user) return;
+    this.matching.get(userId)?.leave(user);
+    this.matching.delete(userId);
+    user.disconnectFromGame();
+    user.send(Messages.STATUS, GameStatus.NONE);
   }
 
   abortGame(game: Game) {
-    game.players.forEach((userId) => this.leaveGame(userId));
+    game.players.forEach((user) => this.leaveGame(user.id));
     this.games.delete(game.id);
   }
 

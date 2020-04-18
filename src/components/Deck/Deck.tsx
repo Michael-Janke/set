@@ -71,7 +71,6 @@ const Deck = ({
 
   return (
     <>
-      <button onClick={() => game.abortGame()}>Abbrechen</button>
       {props.map(({ x, y, scale, z, opacity }, i) => {
         return (
           <animated.div

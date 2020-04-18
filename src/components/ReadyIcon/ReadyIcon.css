@@ -1,0 +1,43 @@
+.ready-icon {
+  display: inline-block;
+  position: relative;
+  width: 2em;
+  height: 2em;
+  transition: transform 0.5s ease;
+  overflow: hidden;
+  margin: 1em;
+}
+.ready-icon > span {
+  display: block;
+  background-color: #9e9e9e;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2em;
+  height: 2em;
+  transition: all 0.5s ease;
+}
+
+.ready-icon.close {
+  transform: rotate(45deg);
+}
+.ready-icon.close > span,
+.ready-icon.plus > span {
+  transform: scale(1, 0.2);
+}
+.ready-icon.close > span.s3,
+.ready-icon.plus > span.s3 {
+  transform: scale(0.2, 1);
+}
+
+.ready-icon.checked > span {
+  width: 1em;
+  height: 0.4em;
+  transform-origin: 100% 100%;
+  transform: translate(-0.3em, 1.4em) rotate(45deg);
+}
+.ready-icon.checked > span.s3 {
+  width: 1.8em;
+  transform-origin: 0 100%;
+  transform: translate(0.7em, 1.4em) rotate(-45deg);
+}
