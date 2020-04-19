@@ -44,6 +44,7 @@
     "server": "cd server && ts-node-dev index.ts",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "react-scripts build",
+    "build-server": "cd server && tsc  ",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
