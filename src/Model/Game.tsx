@@ -6,7 +6,10 @@ import { GameStatus } from "../common/gameStatus";
 import { Messages, ErrorMessages } from "../common/messages";
 import { observer } from "mobx-react-lite";
 
-const SERVER = "ws://localhost:8080";
+const SERVER = [
+  "wss://" + location.hostname + location.pathname,
+  "ws://localhost:8080",
+];
 
 class Game {
   constructor() {
