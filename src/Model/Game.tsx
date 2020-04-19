@@ -4,12 +4,14 @@ import ReconnectingWebSocket from "reconnecting-websocket";
 import Card from "./Card";
 import { GameStatus } from "../common/gameStatus";
 import { Messages, ErrorMessages } from "../common/messages";
-import { observer } from "mobx-react-lite";
 
-const SERVER = [
-  "wss://" + location.hostname + location.pathname,
+let urls = [
+  "wss://" + window.location.hostname + "/api",
   "ws://localhost:8080",
 ];
+let urlIndex = 0;
+// round robin url provider
+const urlProvider = () => urls[++urlIndex % urls.length];
 
 class Game {
   constructor() {
@@ -28,9 +30,10 @@ class Game {
 
   startServer() {
     if (this.userId === undefined) throw new Error("no userID");
-    const rws = new ReconnectingWebSocket(SERVER, [], { debug: false });
+    const rws = new ReconnectingWebSocket(urlProvider, [], { debug: false });
     this.ws = rws;
     rws.addEventListener("open", () => {
+      urls = [urls[urlIndex % urls.length]]; //fix websocket url
       this.connected = true;
       rws.send(JSON.stringify([Messages.USER_ID, this.userId]));
     });
