@@ -34,6 +34,7 @@ const DeckContainer = () => {
           cols={cols}
           rows={rows}
           width={width}
+          parentWidth={bounds.width}
           onSelect={(i) => game.selectCard(i)}
         />
       )}

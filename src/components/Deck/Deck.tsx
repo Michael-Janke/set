@@ -12,11 +12,13 @@ const Deck = ({
   onSelect,
   width,
   cols,
+  parentWidth,
 }: {
   onSelect: (i: number) => void;
   width: number;
   cols: number;
   rows: number;
+  parentWidth: number;
 }) => {
   const game = useContext(Game);
   const { cards, selectedCards, deck } = game;
@@ -26,7 +28,9 @@ const Deck = ({
   ) => { x: number; y: number; scale: number; width: number } = (
     i: number
   ) => ({
-    x: (i % cols) * (width * 1.1),
+    x:
+      (i % cols) * (width * 1.1) +
+      (parentWidth - cols * width * 1.1 + width * 0.1) / 2, //margin
     y: Math.floor(i / cols) * (width * 1.6),
     scale: Math.max(0, width / 100),
     width,

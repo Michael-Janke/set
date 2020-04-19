@@ -13,7 +13,15 @@ export default function Lobby() {
 
   return useObserver(() => (
     <div className="game-container">
-      <PlayerList />
+      <div className="game-bar">
+        <PlayerList />
+        <div
+          className="button button-create small close-button"
+          onClick={() => game.leaveGame()}
+        >
+          <span>x</span>
+        </div>
+      </div>
       <div className="deck">
         <Deck />
       </div>

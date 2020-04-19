@@ -14,31 +14,66 @@ function PlayerList() {
       opacity: 0,
       height: 0,
     },
-    enter: [{ opacity: 1, height: 80 }],
+    enter: [{ opacity: 1, height: 50 }],
     leave: [{ opacity: 0, height: 0 }],
   });
   return (
     <div className="players">
       {transitions.map(({ item, props: { ...rest } }) => (
-        <animated.div className="player-container">
-          <animated.div
-            className="player"
-            key={item.id}
-            style={{
-              overflow: "hidden",
-              ...rest,
-              ...background(parseInt(item.id)),
-            }}
-          >
-            <ConnectedItem id={item.id} />
-          </animated.div>
-        </animated.div>
+        <Observer>
+          {() => {
+            const player = game.players.find((player) => player.id === item.id);
+            const owner = game.players.find((player) => player.owner);
+            if (!player) return <div />;
+
+            return (
+              <animated.div className="player-container">
+                <animated.div
+                  className="player"
+                  key={item.id}
+                  style={{
+                    overflow: "hidden",
+                    ...rest,
+                    ...background(parseInt(player.id), player.selecting),
+                  }}
+                >
+                  <div className="name-container">
+                    <span className="name">{player.name} </span>
+                    {game.status === GameStatus.FINISHED && (
+                      <Score score={player.sets} />
+                    )}
+                    {(game.status === GameStatus.LOBBY ||
+                      game.status === GameStatus.FINISHED) && (
+                      <ReadyIcon ready={player.ready} />
+                    )}
+                    {game.status === GameStatus.RUNNING && (
+                      <Score score={player.sets} />
+                    )}
+                  </div>
+                </animated.div>
+                {game.status === GameStatus.FINISHED &&
+                  owner &&
+                  player &&
+                  game.publicId === owner.id &&
+                  !player.owner && (
+                    <div
+                      className="kick-button"
+                      onClick={() => game.kick(player.id)}
+                    >
+                      Spieler entfernen
+                    </div>
+                  )}
+              </animated.div>
+            );
+          }}
+        </Observer>
       ))}
     </div>
   );
 }
 
-const background = (i: number) => {
+const background = (i: number, selecting: boolean) => {
+  const selectingColor = selecting && "rgb(198, 40, 40)";
   const colors = [
     "#f6d365",
     "#fda085",
@@ -48,31 +83,13 @@ const background = (i: number) => {
     "#b490ca",
     "#c3cfe2",
   ];
-  const color1 = colors[(i * 2) % colors.length];
+  const color1 = selectingColor || colors[(i * 2) % colors.length];
   const color2 =
+    selectingColor ||
     colors[(i * 2 + 1 + Math.floor(i / colors.length)) % colors.length];
-
   return {
     background: `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`,
   };
 };
-
-const ConnectedItem = observer(({ id }: { id: string }) => {
-  const game = useContext(Game);
-  const player = game.players.find((player) => player.id === id);
-  if (!player) return null;
-  return (
-    <div className="name-container">
-      <span className="name">{player.name} </span>
-      {game.status === GameStatus.LOBBY && <ReadyIcon ready={player.ready} />}
-      {game.status === GameStatus.RUNNING && (
-        <Score score={player.score.sets} />
-      )}
-      {game.status === GameStatus.FINISHED && (
-        <Score score={player.score.sets} />
-      )}
-    </div>
-  );
-});
 
 export default observer(PlayerList);

@@ -8,7 +8,13 @@
 }
 
 .player-container {
-  height: 100px;
+  height: 70px;
+  margin-bottom: 20px;
+}
+
+.kick-button {
+  margin-top: -10px;
+  cursor: pointer;
 }
 
 .player {

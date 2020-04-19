@@ -74,9 +74,14 @@ export default function websocket(ws: ws, req: express.Request) {
           user.send(Messages.ERROR, ErrorMessages.GAME_NOT_EXIST);
         }
         break;
-      case Messages.ABORT_GAME:
+      case Messages.LEAVE_GAME:
         DEBUG && console.log("[received]:", "abort game");
         if (!game) break;
+        matching.leaveGame(user.id);
+        break;
+      case Messages.ABORT_GAME:
+        DEBUG && console.log("[received]:", "abort game");
+        if (!game || game.owner !== user) break;
         matching.abortGame(game);
         break;
       case Messages.USER_NAME:
@@ -91,6 +96,16 @@ export default function websocket(ws: ws, req: express.Request) {
             ["is not ready anymore", "is ready"][data ? 1 : 0]
           );
         user.ready = data;
+        break;
+
+      case Messages.KICK:
+        DEBUG && console.log("[received]:", user.publicId, "kicks", data);
+        if (game?.owner === user) {
+          const user = Array.from(matching.users.values()).find(
+            (user) => user.publicId === data
+          );
+          user && matching.leaveGame(user.id);
+        }
         break;
 
       default:

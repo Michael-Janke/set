@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { GAME_ID_LENGTH } from "../common/gameStatus";
 import CodeInput from "components/CodeInput";
 
@@ -9,6 +9,14 @@ import Error from "components/Error";
 
 export default function CreateOrJoinGame() {
   const [code, setCode] = useState(window.location.hash);
+  useEffect(() => {
+    const updateCode = () => setCode(window.location.hash);
+
+    window.addEventListener("hashchange", updateCode, false);
+    return () => {
+      window.removeEventListener("hashchange", updateCode);
+    };
+  }, []);
   const game = useContext(Game);
 
   return (

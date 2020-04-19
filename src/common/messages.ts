@@ -8,13 +8,16 @@ export enum Messages {
   CREATE_GAME = "createGame",
   JOIN_GAME = "joinGame",
   ABORT_GAME = "abortGame",
+  LEAVE_GAME = "leaveGame",
   USER_ID = "userId",
   ERROR = "error",
   GAME_ID = "gameId",
   USER_NAME = "userName",
+  PUBLIC_ID = "publicId",
   PLAYERS = "players",
   SET_READINESS = "setReadiness",
   READY = "ready",
+  KICK = "kick",
 }
 
 export enum ErrorMessages {

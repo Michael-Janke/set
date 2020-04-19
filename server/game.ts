@@ -28,6 +28,7 @@ class Game {
 
   players: Set<User> = new Set();
   statistics: Map<User, { sets: number }> = new Map();
+  blockTimer: NodeJS.Timeout | undefined;
 
   join(user: User) {
     this.players.add(user);
@@ -44,14 +45,29 @@ class Game {
       name: user.name,
       id: user.publicId,
       ready: user.ready,
-      score: this.statistics.get(user),
+      sets: this.statistics.get(user)?.sets,
       owner: user === this.owner,
+      connected: user.connected,
+      selecting: user.selecting,
     }));
   }
 
   clickCard(card: number, user: User) {
     if (!this.players.has(user))
       return user.send(Messages.ERROR, ErrorMessages.PERMISSION_DENIED);
+
+    if (this.selectedCards.length === 0) {
+      user.selecting = true;
+      this.blockTimer = setTimeout(() => {
+        user.selecting = false;
+        this.selectedCards.length = 0;
+      }, 5000);
+    } else {
+      if (!user.selecting) {
+        return user.send(Messages.SELECTED_CARDS, this.selectedCards);
+      }
+    }
+
     this.selectedCards.indexOf(card) >= 0
       ? this.selectedCards.splice(this.selectedCards.indexOf(card), 1)
       : this.selectedCards.push(card);
@@ -61,6 +77,10 @@ class Game {
     if (isSet) {
       const stats = this.statistics.get(user);
       stats && stats.sets++;
+    }
+    if (this.selectedCards.length === 0) {
+      user.selecting = false;
+      this.blockTimer && clearTimeout(this.blockTimer);
     }
   }
 

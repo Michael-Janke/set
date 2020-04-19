@@ -1,5 +1,11 @@
 import * as ws from "ws";
-import { decorate, observable, autorun, IReactionDisposer } from "mobx";
+import {
+  decorate,
+  observable,
+  autorun,
+  IReactionDisposer,
+  computed,
+} from "mobx";
 import Game from "./game";
 import { Messages } from "../src/common/messages";
 import { DEBUG } from ".";
@@ -20,16 +26,21 @@ class User {
   publicId: string = new Date().getTime().toString();
   disposer: IReactionDisposer[] = [];
   ready: boolean = false;
+  selecting: boolean = false;
 
   registerSocket(ws: ws) {
     this.sockets.add(ws);
     const dispose = autorun(() => this.send(Messages.USER_NAME, this.name));
     const dispose2 = autorun(() => this.send(Messages.READY, this.ready));
+    const dispose3 = autorun(() =>
+      this.send(Messages.PUBLIC_ID, this.publicId)
+    );
 
     ws.on("close", () => {
       this.sockets.delete(ws);
       dispose();
       dispose2();
+      dispose3();
     });
   }
 
@@ -69,11 +80,18 @@ class User {
       ws.on("close", () => this.disconnectFromGame())
     );
   }
+
+  get connected() {
+    return this.sockets.size > 0;
+  }
 }
 
 decorate(User, {
   name: observable,
   ready: observable,
+  selecting: observable,
+  connected: computed,
+  publicId: observable,
 });
 
 export default User;

@@ -7,3 +7,20 @@
 .deck {
   flex: 1;
 }
+
+.game-bar {
+  display: flex;
+  flex-direction: row;
+}
+
+.game-bar > .players {
+  flex-wrap: nowrap;
+  overflow: auto;
+}
+
+.close-button {
+  position: absolute !important;
+  top: 5px;
+  right: 5px;
+  margin: 0 !important;
+}

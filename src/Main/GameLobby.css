@@ -4,7 +4,7 @@
 }
 
 .input {
-  width: 200px;
+  width: 150px;
   background: #fff;
   color: #a3a3a3;
   font: inherit;
@@ -18,7 +18,7 @@
 .input-container {
   position: relative;
   display: inline-block;
-  margin: 30px 10px;
+  margin: 0px 30px 15px;
 }
 
 .label {
@@ -64,4 +64,5 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-evenly;
+  flex-wrap: wrap;
 }

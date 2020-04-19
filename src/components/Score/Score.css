@@ -2,6 +2,7 @@
   position: relative;
   margin: 15px;
   height: 30px;
+  width: 10px;
 }
 .score .number {
   position: absolute;

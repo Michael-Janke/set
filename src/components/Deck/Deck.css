@@ -3,6 +3,7 @@
   width: 100%;
   position: relative;
   transform-style: preserve-3d;
+  margin-bottom: 10px;
 }
 
 .cardWrapper {

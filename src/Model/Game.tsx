@@ -56,6 +56,9 @@ class Game {
         case Messages.USER_NAME:
           this.userName = data;
           break;
+        case Messages.PUBLIC_ID:
+          this.publicId = data;
+          break;
 
         case Messages.GAME_ID:
           this.gameId = data;
@@ -96,6 +99,7 @@ class Game {
   status: string = GameStatus.LOBBY;
 
   userId: string | undefined;
+  publicId: string | undefined;
   userName: string = "";
   gameId: string | undefined;
   error: ErrorMessages | undefined;
@@ -106,7 +110,9 @@ class Game {
     name: string;
     id: string;
     ready: boolean;
-    score: { sets: number };
+    sets: number;
+    selecting: boolean;
+    owner: boolean;
   }[] = [];
 
   selectCard(i: number) {
@@ -140,6 +146,11 @@ class Game {
     this.ws.send(JSON.stringify([Messages.JOIN_GAME, code]));
   }
 
+  leaveGame() {
+    if (!this.ws || !this.connected) return;
+    this.ws.send(JSON.stringify([Messages.LEAVE_GAME]));
+  }
+
   setName(name: string) {
     if (!this.ws || !this.connected) return;
     this.ws.send(JSON.stringify([Messages.USER_NAME, name]));
@@ -149,6 +160,11 @@ class Game {
   setReadiness(ready: boolean) {
     if (!this.ws || !this.connected) return;
     this.ws.send(JSON.stringify([Messages.SET_READINESS, ready]));
+  }
+
+  kick(id: string) {
+    if (!this.ws || !this.connected) return;
+    this.ws.send(JSON.stringify([Messages.KICK, id]));
   }
 }
 
@@ -163,13 +179,16 @@ decorate(Game, {
   startGame: action,
   abortGame: action,
   joinGame: action,
+  leaveGame: action,
   createGame: action,
   setName: action,
+  kick: action,
   error: observable,
   gameId: observable,
   players: observable,
   setReadiness: action,
   ready: observable,
+  publicId: observable,
 });
 
 export default createContext(new Game());
