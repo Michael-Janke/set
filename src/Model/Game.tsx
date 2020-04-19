@@ -5,13 +5,10 @@ import Card from "./Card";
 import { GameStatus } from "../common/gameStatus";
 import { Messages, ErrorMessages } from "../common/messages";
 
-let urls = [
-  "wss://" + window.location.hostname + "/api",
-  "ws://localhost:8080",
-];
-let urlIndex = 0;
-// round robin url provider
-const urlProvider = () => urls[++urlIndex % urls.length];
+let SERVER = [
+  "wss://" + window.location.hostname + "/ws",
+  "ws://localhost:8080/ws",
+][window.location.hostname === "localhost" ? 1 : 0];
 
 class Game {
   constructor() {
@@ -30,10 +27,9 @@ class Game {
 
   startServer() {
     if (this.userId === undefined) throw new Error("no userID");
-    const rws = new ReconnectingWebSocket(urlProvider, [], { debug: false });
+    const rws = new ReconnectingWebSocket(SERVER, [], { debug: false });
     this.ws = rws;
     rws.addEventListener("open", () => {
-      urls = [urls[urlIndex % urls.length]]; //fix websocket url
       this.connected = true;
       rws.send(JSON.stringify([Messages.USER_ID, this.userId]));
     });

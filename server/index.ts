@@ -8,9 +8,7 @@ let { app } = wsInstance;
 
 export const DEBUG = process.env.NODE_ENV !== "production";
 
-app.use(express.static("../build"));
-
-app.ws("/", websocket);
+app.ws("/ws", websocket);
 
 //start our server
 app.listen(process.env.PORT || 8080, () => {
