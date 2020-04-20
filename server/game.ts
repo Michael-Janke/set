@@ -5,10 +5,12 @@ import { observable, action, decorate, computed } from "mobx";
 import { GameStatus } from "../src/common/gameStatus";
 import User from "./user";
 import { Messages, ErrorMessages } from "../src/common/messages";
+import Statistics from "./statistics";
 
 export type GameId = string;
 const SET_REFILL_DELAY = 3000;
 const NO_SET_REFILL_DELAY = 1000;
+const NO_SET_COOL_DOWN = 5000;
 
 const NORMAL_CARD_COUNT = 12;
 
@@ -28,17 +30,16 @@ class Game {
   owner: User;
 
   players: Set<User> = new Set();
-  statistics: Map<User, { sets: number; failSets: number }> = new Map();
   blockTimer: NodeJS.Timeout | undefined;
 
   join(user: User) {
     this.players.add(user);
-    this.statistics.set(user, { sets: 0, failSets: 0 });
+    user.statistics = new Statistics();
   }
 
   leave(user: User) {
     this.players.delete(user);
-    this.statistics.delete(user);
+    user.statistics = new Statistics();
   }
 
   get playerList() {
@@ -46,16 +47,21 @@ class Game {
       name: user.name,
       id: user.publicId,
       ready: user.ready,
-      sets: this.statistics.get(user)?.sets,
+      sets: user.statistics.sets,
+      fails: user.statistics.fails,
       owner: user === this.owner,
       connected: user.connected,
-      selecting: user.selecting,
+      selecting: user.selecting || user.coolDown,
     }));
   }
 
   clickCard(card: number, user: User) {
     if (!this.players.has(user))
       return user.send(Messages.ERROR, ErrorMessages.PERMISSION_DENIED);
+
+    if (user.coolDown) {
+      return user.send(Messages.SELECTED_CARDS, this.selectedCards);
+    }
 
     if (this.selectedCards.length === 0) {
       user.selecting = true;
@@ -81,11 +87,14 @@ class Game {
     const selectedCards = this.selectedCards.map((id) => this.cards[id]);
     const isSet2 = isSet(selectedCards[0], selectedCards[1], selectedCards[2]);
 
-    const stats = this.statistics.get(user);
     if (isSet2) {
-      stats && stats.sets++;
+      user.statistics.sets++;
     } else {
-      stats && stats.failSets++;
+      user.statistics.fails++;
+    }
+
+    if (!isSet2) {
+      user.startCoolDown(NO_SET_COOL_DOWN);
     }
 
     this.blockTimer && clearTimeout(this.blockTimer);
@@ -94,7 +103,7 @@ class Game {
     this.players.forEach((user) => user.send(Messages.SELECTED_SET, isSet2));
 
     setTimeout(
-      () => {
+      action(() => {
         if (isSet2) {
           this.selectedCards.forEach((card) => {
             const i = this.deck.indexOf(card);
@@ -102,9 +111,8 @@ class Game {
           });
           this.fillDeck();
         }
-
         this.selectedCards.length = 0;
-      },
+      }),
       isSet2 ? SET_REFILL_DELAY : NO_SET_REFILL_DELAY
     );
     return isSet2;
@@ -173,7 +181,7 @@ class Game {
     this.deck.length = 0;
     this.pile = shuffleArray(Array.from(this.cards.keys()));
     this.fillDeck();
-    this.statistics.forEach((ref) => (ref.sets = 0));
+    this.players.forEach((user) => (user.statistics = new Statistics()));
     this.status = GameStatus.RUNNING;
   }
 
@@ -209,7 +217,6 @@ decorate(Game, {
   selectedCards: observable,
   status: observable,
   players: observable,
-  statistics: observable,
   clickCard: action,
   startGame: action,
   endGame: action,

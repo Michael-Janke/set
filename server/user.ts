@@ -5,10 +5,12 @@ import {
   autorun,
   IReactionDisposer,
   computed,
+  action,
 } from "mobx";
 import Game from "./game";
 import { Messages } from "../src/common/messages";
 import { DEBUG } from ".";
+import Statistics from "./statistics";
 
 const names = ["Captain America", "Ironman", "Superman", "Batman", "Flash"];
 let lastIndex = 0;
@@ -27,6 +29,15 @@ class User {
   disposer: IReactionDisposer[] = [];
   ready: boolean = false;
   selecting: boolean = false;
+  coolDown: boolean = false;
+  coolDownTimer: NodeJS.Timeout | null = null;
+  statistics = new Statistics();
+
+  startCoolDown(duration: number) {
+    this.coolDownTimer && clearTimeout(this.coolDownTimer);
+    this.coolDown = true;
+    this.coolDownTimer = setTimeout(() => (this.coolDown = false), duration);
+  }
 
   registerSocket(ws: ws) {
     this.sockets.add(ws);
@@ -92,6 +103,9 @@ decorate(User, {
   selecting: observable,
   connected: computed,
   publicId: observable,
+  statistics: observable,
+  coolDown: observable,
+  startCoolDown: action,
 });
 
 export default User;

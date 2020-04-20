@@ -54,9 +54,7 @@ class Game {
 
         case Messages.STATUS:
           this.status = data as GameStatus;
-          if (this.status === GameStatus.LOBBY) {
-            SoundPool.init();
-          }
+          SoundPool.init();
           break;
 
         case Messages.USER_NAME:
