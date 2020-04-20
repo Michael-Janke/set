@@ -123,9 +123,6 @@ class Game {
   }
 
   fillDeck() {
-    if (this.pile.length === 0 && !this.deckContainsSet())
-      return this.endGame();
-
     const cardsOnDeck = this.deck.filter((card) => card !== null) as number[];
 
     //fill deck with new cards upto 12
@@ -150,6 +147,7 @@ class Game {
 
   checkExtraCards() {
     const deckContainsSet = this.deckContainsSet();
+    if (this.pile.length === 0 && !deckContainsSet) return this.endGame();
     if (!deckContainsSet) {
       this.pile.length && this.deck.push(this.pile.pop() as number);
       this.pile.length && this.deck.push(this.pile.pop() as number);
