@@ -4,6 +4,7 @@ import ReconnectingWebSocket from "reconnecting-websocket";
 import Card from "./Card";
 import { GameStatus } from "../common/gameStatus";
 import { Messages, ErrorMessages } from "../common/messages";
+import SoundPool, { Sounds } from "../components/SoundPool";
 
 let SERVER = [
   "wss://" + window.location.hostname + "/ws",
@@ -53,6 +54,9 @@ class Game {
 
         case Messages.STATUS:
           this.status = data as GameStatus;
+          if (this.status === GameStatus.LOBBY) {
+            SoundPool.init();
+          }
           break;
 
         case Messages.USER_NAME:
@@ -81,6 +85,9 @@ class Game {
             if (this.error === data) this.error = undefined;
           }, 5000);
           break;
+
+        case Messages.SELECTED_SET:
+          SoundPool.play(data ? Sounds.SUCCESS : Sounds.FAILURE);
 
         default:
           break;

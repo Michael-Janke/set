@@ -3,11 +3,12 @@ import { $enum } from "ts-enum-util";
 import { observable, action, decorate, computed } from "mobx";
 
 import { GameStatus } from "../src/common/gameStatus";
-import { UserId } from "./matching";
 import User from "./user";
 import { Messages, ErrorMessages } from "../src/common/messages";
 
 export type GameId = string;
+const SET_REFILL_DELAY = 3000;
+const NO_SET_REFILL_DELAY = 1000;
 
 const NORMAL_CARD_COUNT = 12;
 
@@ -27,12 +28,12 @@ class Game {
   owner: User;
 
   players: Set<User> = new Set();
-  statistics: Map<User, { sets: number }> = new Map();
+  statistics: Map<User, { sets: number; failSets: number }> = new Map();
   blockTimer: NodeJS.Timeout | undefined;
 
   join(user: User) {
     this.players.add(user);
-    this.statistics.set(user, { sets: 0 });
+    this.statistics.set(user, { sets: 0, failSets: 0 });
   }
 
   leave(user: User) {
@@ -72,32 +73,41 @@ class Game {
       ? this.selectedCards.splice(this.selectedCards.indexOf(card), 1)
       : this.selectedCards.push(card);
 
-    const isSet = this.checkSet();
-
-    if (isSet) {
-      const stats = this.statistics.get(user);
-      stats && stats.sets++;
-    }
-    if (this.selectedCards.length === 0) {
-      user.selecting = false;
-      this.blockTimer && clearTimeout(this.blockTimer);
-    }
+    this.checkSet(user);
   }
 
-  checkSet() {
+  checkSet(user: User) {
     if (this.selectedCards.length !== 3) return;
-    let set = false;
     const selectedCards = this.selectedCards.map((id) => this.cards[id]);
-    if (isSet(selectedCards[0], selectedCards[1], selectedCards[2])) {
-      this.selectedCards.forEach((card) => {
-        const i = this.deck.indexOf(card);
-        this.deck[i] = null;
-      });
-      this.fillDeck();
-      set = true;
+    const isSet2 = isSet(selectedCards[0], selectedCards[1], selectedCards[2]);
+
+    const stats = this.statistics.get(user);
+    if (isSet2) {
+      stats && stats.sets++;
+    } else {
+      stats && stats.failSets++;
     }
-    this.selectedCards.length = 0;
-    return set;
+
+    this.blockTimer && clearTimeout(this.blockTimer);
+    user.selecting = false;
+
+    this.players.forEach((user) => user.send(Messages.SELECTED_SET, isSet2));
+
+    setTimeout(
+      () => {
+        if (isSet2) {
+          this.selectedCards.forEach((card) => {
+            const i = this.deck.indexOf(card);
+            this.deck[i] = null;
+          });
+          this.fillDeck();
+        }
+
+        this.selectedCards.length = 0;
+      },
+      isSet2 ? SET_REFILL_DELAY : NO_SET_REFILL_DELAY
+    );
+    return isSet2;
   }
 
   endGame() {

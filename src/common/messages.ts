@@ -18,6 +18,7 @@ export enum Messages {
   SET_READINESS = "setReadiness",
   READY = "ready",
   KICK = "kick",
+  SELECTED_SET = "selectedSet",
 }
 
 export enum ErrorMessages {
