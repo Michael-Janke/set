@@ -25,6 +25,7 @@ export enum Messages {
   OWNER = "owner",
   TIPP_AVAILABLE = "tippAvailable",
   SEND_TIPP = "sendTipp",
+  CONTAINS_OMA = "containsOma",
 }
 
 export enum ErrorMessages {

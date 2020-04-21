@@ -1,4 +1,11 @@
-import Card, { Fill, Color, Shape, Number, isSet } from "../src/common/Card";
+import Card, {
+  Fill,
+  Color,
+  Shape,
+  Number,
+  isSet,
+  isOma,
+} from "../src/common/Card";
 import { $enum } from "ts-enum-util";
 import { observable, action, decorate, computed } from "mobx";
 
@@ -13,7 +20,7 @@ const SET_REFILL_DELAY = 3000;
 const NO_SET_REFILL_DELAY = 1000;
 const NO_SET_COOL_DOWN = 5000;
 const MAX_SELECT_TIME = 5000;
-const TIPP_WAIT_TIME = 30000;
+const TIPP_WAIT_TIME = 1000;
 
 const NORMAL_CARD_COUNT = 12;
 
@@ -167,6 +174,7 @@ class Game {
         }
       }
     }
+    this.checkOma();
   }
 
   checkExtraCards() {
@@ -185,6 +193,18 @@ class Game {
     if (deck.length < 3) return undefined;
     return getCombinations(deck, 3).find((combination) =>
       isSet(
+        this.cards[combination[0]],
+        this.cards[combination[1]],
+        this.cards[combination[2]]
+      )
+    );
+  }
+
+  containsOma = false;
+  checkOma() {
+    const deck = this.deck.filter((card) => card !== null) as number[];
+    this.containsOma = getCombinations(deck, 3).some((combination) =>
+      isOma(
         this.cards[combination[0]],
         this.cards[combination[1]],
         this.cards[combination[2]]
@@ -270,6 +290,7 @@ decorate(Game, {
   playerList: computed,
   tippIsAvailable: observable,
   sendTipp: action,
+  containsOma: observable,
 });
 
 export default Game;

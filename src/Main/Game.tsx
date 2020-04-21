@@ -8,6 +8,7 @@ import Deck from "components/Deck";
 
 import "./Game.css";
 import GameControl from "components/GameControl";
+import Grandma from "components/Grandma";
 
 export default function Lobby() {
   return (
@@ -15,6 +16,7 @@ export default function Lobby() {
       <div className="game-bar">
         <PlayerList />
         <GameControl />
+        <Grandma />
       </div>
 
       <Deck />

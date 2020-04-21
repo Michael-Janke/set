@@ -94,6 +94,11 @@ class Game {
 
         case Messages.TIPP_AVAILABLE:
           this.tippIsAvailable = data;
+          break;
+
+        case Messages.CONTAINS_OMA:
+          this.containsOma = data;
+          break;
 
         default:
           break;
@@ -122,6 +127,7 @@ class Game {
 
   highlightedCards: { [key: string]: string[] } = {};
   tippIsAvailable = false;
+  containsOma = false;
 
   get userName() {
     return this.players.find((p) => p.id === this.publicId)?.name || "loading";
@@ -225,6 +231,7 @@ decorate(Game, {
   publicId: observable,
   highlightedCards: observable,
   tippIsAvailable: observable,
+  containsOma: observable,
 });
 
 export default createContext(new Game());

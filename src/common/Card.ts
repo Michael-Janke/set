@@ -68,3 +68,18 @@ export const isSet = (card1: Card, card2: Card, card3: Card) => {
     isSameOrDifferent<Number>(card1.number, card2.number, card3.number)
   );
 };
+
+const isSame = <T extends CardProperty>(a: T, b: T, c: T) => {
+  return a === b && b === c;
+};
+
+export const isOma = (card1: Card, card2: Card, card3: Card) => {
+  if (!isSet) return false;
+  return (
+    (isSame<Shape>(card1.shape, card2.shape, card3.shape) ? 1 : 0) +
+      (isSame<Color>(card1.color, card2.color, card3.color) ? 1 : 0) +
+      (isSame<Fill>(card1.fill, card2.fill, card3.fill) ? 1 : 0) +
+      (isSame<Number>(card1.number, card2.number, card3.number) ? 1 : 0) >=
+    3
+  );
+};
