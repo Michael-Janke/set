@@ -20,7 +20,6 @@
     "global": "^4.4.0",
     "mobx": "^5.15.4",
     "mobx-react": "^6.2.2",
-    "mobx-react-lite": "^2.0.6",
     "node-sass": "^4.13.1",
     "node-ts": "^5.0.5",
     "nodemon": "^2.0.3",
@@ -86,8 +85,7 @@
     "eslint-plugin-react": "^7.19.0",
     "eslint-plugin-react-hooks": "^3.0.0",
     "husky": "^4.2.5",
-    "ts-node-dev": "^1.0.0-pre.44",
-    "typescript": "^3.7.2"
+    "ts-node-dev": "^1.0.0-pre.44"
   },
   "husky": {
     "hooks": {

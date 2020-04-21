@@ -45,6 +45,7 @@ class Game {
           break;
 
         case Messages.DECK:
+          data.length - this.deck.length >= 0 && SoundPool.play(Sounds.DECK);
           observable(this.deck).replace(data);
           break;
 
@@ -56,6 +57,7 @@ class Game {
         case Messages.STATUS:
           this.status = data as GameStatus;
           SoundPool.init();
+
           break;
 
         case Messages.USER_NAME:

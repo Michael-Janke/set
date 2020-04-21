@@ -76,7 +76,11 @@ class Game {
     );
 
     // block guard
-    if (user.coolDown || someoneElseIsSelecting) {
+    if (
+      this.selectedCards.length === 3 ||
+      user.coolDown ||
+      someoneElseIsSelecting
+    ) {
       user.send(Messages.ERROR, ErrorMessages.CLICK_IS_BLOCKED);
       return user.send(Messages.SELECTED_CARDS, this.selectedCards);
     }
@@ -110,7 +114,6 @@ class Game {
     }
 
     this.blockTimer && clearTimeout(this.blockTimer);
-    user.selecting = false;
 
     this.players.forEach((user) => user.send(Messages.SELECTED_SET, isSet2));
 
@@ -123,6 +126,7 @@ class Game {
           });
           this.fillDeck();
         }
+        user.selecting = false;
         this.selectedCards.length = 0;
       }),
       isSet2 ? SET_REFILL_DELAY : NO_SET_REFILL_DELAY

@@ -21,6 +21,7 @@ export default function CodeInput({
     if (value !== codeFilter(value)) {
       onChange(codeFilter(value));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <input

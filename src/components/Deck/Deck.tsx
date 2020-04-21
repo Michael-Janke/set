@@ -66,7 +66,7 @@ const Deck = ({
   useEffect(() => observe(selectedCards, update, true));
   useEffect(() => observe(deck, update, true));
 
-  const [x, setX] = useState(deck.length + " " + cards.length);
+  const [, setX] = useState(deck.length + " " + cards.length);
   useEffect(() =>
     reaction(
       () => deck.length + " " + cards.length,

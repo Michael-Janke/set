@@ -3,7 +3,7 @@ import { GAME_ID_LENGTH } from "../common/gameStatus";
 import CodeInput from "components/CodeInput";
 
 import "./CreateOrJoinGame.css";
-import { ErrorMessages, ErrorText } from "common/messages";
+import { ErrorMessages } from "common/messages";
 import Game from "Model/Game";
 import Error from "components/Error";
 
