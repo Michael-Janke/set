@@ -1,8 +1,9 @@
-import Card, { Fill, Color, Shape, Number, isSet } from "../src/Model/Card";
+import Card, { Fill, Color, Shape, Number, isSet } from "../src/common/Card";
 import { $enum } from "ts-enum-util";
 import { observable, action, decorate, computed } from "mobx";
 
 import { GameStatus } from "../src/common/gameStatus";
+import PublicUser from "../src/common/publicUser";
 import User from "./user";
 import { Messages, ErrorMessages } from "../src/common/messages";
 import Statistics from "./statistics";
@@ -45,16 +46,20 @@ class Game {
   }
 
   get playerList() {
-    return Array.from(this.players).map((user) => ({
-      name: user.name,
-      id: user.publicId,
-      ready: user.ready,
-      sets: user.statistics.sets,
-      fails: user.statistics.fails,
-      owner: user === this.owner,
-      connected: user.connected,
-      selecting: user.selecting || user.coolDown,
-    }));
+    return Array.from(this.players).map(
+      (user) =>
+        ({
+          name: user.name,
+          color: user.color,
+          id: user.publicId,
+          ready: user.ready,
+          sets: user.statistics.sets,
+          fails: user.statistics.fails,
+          connected: user.connected,
+          selecting: user.selecting || user.coolDown,
+          owner: this.owner === user,
+        } as PublicUser)
+    );
   }
 
   get highlightedCards() {
@@ -62,7 +67,7 @@ class Game {
     this.players.forEach((user) => {
       if (user.highlightedCard === null) return;
       obj[user.highlightedCard] = obj[user.highlightedCard] || [];
-      obj[user.highlightedCard].push(user.name.slice(0, 2));
+      obj[user.highlightedCard].push(user.publicId);
     });
     return obj;
   }

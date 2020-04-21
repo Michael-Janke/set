@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { useObserver } from "mobx-react-lite";
+import { useObserver } from "mobx-react";
 import "./App.css";
 import Main from "./Main";
 import Game from "./Model/Game";

@@ -1,10 +1,11 @@
-import { observable, action, decorate } from "mobx";
+import { observable, action, decorate, computed } from "mobx";
 import { createContext } from "react";
 import ReconnectingWebSocket from "reconnecting-websocket";
-import Card from "./Card";
+import Card from "../common/Card";
 import { GameStatus } from "../common/gameStatus";
 import { Messages, ErrorMessages } from "../common/messages";
 import SoundPool, { Sounds } from "../components/SoundPool";
+import PublicUser from "common/publicUser";
 
 let SERVER = [
   "wss://" + window.location.hostname + "/ws",
@@ -45,23 +46,21 @@ class Game {
           break;
 
         case Messages.DECK:
-          data.length - this.deck.length >= 0 && SoundPool.play(Sounds.DECK);
+          data.length > 0 &&
+            data.length - this.deck.length >= 0 &&
+            SoundPool.play(Sounds.DECK);
           observable(this.deck).replace(data);
           break;
 
         case Messages.SELECTED_CARDS:
           observable(this.selectedCards).replace(data);
-          SoundPool.play(Sounds.CLICK);
+          data.length && SoundPool.play(Sounds.CLICK);
           break;
 
         case Messages.STATUS:
           this.status = data as GameStatus;
           SoundPool.init();
 
-          break;
-
-        case Messages.USER_NAME:
-          this.userName = data;
           break;
 
         case Messages.PUBLIC_ID:
@@ -75,10 +74,6 @@ class Game {
 
         case Messages.PLAYERS:
           observable(this.players).replace(data);
-          break;
-
-        case Messages.READY:
-          this.ready = !!data;
           break;
 
         case Messages.ERROR:
@@ -117,22 +112,24 @@ class Game {
 
   userId: string | undefined;
   publicId: string | undefined;
-  userName: string = "";
   gameId: string | undefined;
   error: ErrorMessages | undefined;
 
-  ready: boolean = false;
-
-  players: {
-    name: string;
-    id: string;
-    ready: boolean;
-    sets: number;
-    selecting: boolean;
-    owner: boolean;
-  }[] = [];
+  players: PublicUser[] = [];
 
   highlightedCards: { [key: string]: string[] } = {};
+
+  get userName() {
+    return this.players.find((p) => p.id === this.publicId)?.name || "loading";
+  }
+
+  get ready() {
+    return this.players.find((p) => p.id === this.publicId)?.ready || false;
+  }
+
+  getPlayerById(id: string) {
+    return this.players.find((p) => p.id === id);
+  }
 
   selectCard(i: number) {
     if (!this.ws || !this.connected) return;
@@ -173,7 +170,6 @@ class Game {
   setName(name: string) {
     if (!this.ws || !this.connected) return;
     this.ws.send(JSON.stringify([Messages.USER_NAME, name]));
-    this.userName = name;
   }
 
   setReadiness(ready: boolean) {
@@ -198,7 +194,7 @@ decorate(Game, {
   selectedCards: observable,
   status: observable,
   connected: observable,
-  userName: observable,
+  userName: computed,
   selectCard: action,
   startGame: action,
   abortGame: action,
@@ -211,7 +207,7 @@ decorate(Game, {
   gameId: observable,
   players: observable,
   setReadiness: action,
-  ready: observable,
+  ready: computed,
   publicId: observable,
   highlightedCards: observable,
 });

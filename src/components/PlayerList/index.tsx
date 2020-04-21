@@ -34,7 +34,11 @@ function PlayerList() {
                   style={{
                     overflow: "hidden",
                     ...rest,
-                    ...background(parseInt(player.id), player.selecting),
+                    ...background(
+                      player.color,
+                      player.selecting,
+                      !player.connected
+                    ),
                   }}
                 >
                   <div className="name-container">
@@ -72,23 +76,17 @@ function PlayerList() {
   );
 }
 
-const background = (i: number, selecting: boolean) => {
-  const selectingColor = selecting && "rgb(198, 40, 40)";
-  const colors = [
-    "#f6d365",
-    "#fda085",
-    "#f093fb",
-    "#f5576c",
-    "#5ee7df",
-    "#b490ca",
-    "#c3cfe2",
-  ];
-  const color1 = selectingColor || colors[(i * 2) % colors.length];
-  const color2 =
-    selectingColor ||
-    colors[(i * 2 + 1 + Math.floor(i / colors.length)) % colors.length];
+export const background = (
+  colors: string[],
+  selecting: boolean,
+  disconected: boolean
+) => {
+  const override =
+    (selecting && "rgb(198, 40, 40)") || (disconected && "#eeeeee");
   return {
-    background: `linear-gradient(135deg, ${color1} 0%, ${color2} 100%)`,
+    background: `linear-gradient(135deg, ${override || colors[0]} 0%, ${
+      override || colors[1]
+    } 100%)`,
   };
 };
 

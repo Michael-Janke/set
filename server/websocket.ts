@@ -20,6 +20,18 @@ export default function websocket(ws: ws, req: express.Request) {
   let user: User | null = null;
   ws.send(JSON.stringify([Messages.STATUS, GameStatus.NONE]));
 
+  //heartbeat
+  let isAlive = true;
+  ws.on("pong", () => (isAlive = true));
+  const interval = setInterval(function ping() {
+    if (isAlive === false) return ws.terminate();
+    isAlive = false;
+    ws.ping(() => {});
+  }, 5000);
+  ws.on("close", function close() {
+    clearInterval(interval);
+  });
+
   ws.on("message", (msg) => {
     let command: string = "";
     let data: any;

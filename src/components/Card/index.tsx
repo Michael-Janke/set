@@ -3,7 +3,7 @@ import React from "react";
 import "./Card.css";
 import { createUseStyles } from "react-jss";
 import ShapeSvg from "./Shape";
-import CardModel from "../../Model/Card";
+import CardModel from "../../common/Card";
 
 interface CardProps extends React.PropsWithChildren<any> {
   card: CardModel;

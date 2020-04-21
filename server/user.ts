@@ -9,7 +9,6 @@ import {
 } from "mobx";
 import Game from "./game";
 import { Messages } from "../src/common/messages";
-import { DEBUG } from ".";
 import Statistics from "./statistics";
 
 const names = ["Captain America", "Ironman", "Superman", "Batman", "Flash"];
@@ -18,17 +17,25 @@ let lastIndex = 0;
 const HIGHLIGHT_DURATION = 3000;
 
 export type UserId = string;
+const connect: [keyof User] = [Messages.PUBLIC_ID];
 
 class User {
   constructor(id: UserId) {
     this.name = names[lastIndex++ % names.length];
+    this.publicId = lastIndex.toString();
     this.id = id;
+
+    this.disposerUser = connect.map((key) =>
+      autorun(() => this.send(key, this[key]))
+    );
   }
   sockets: Set<ws> = new Set();
   name: string;
+  color: string[] = generateColorSet();
   id: UserId;
-  publicId: string = new Date().getTime().toString();
+  publicId: string;
   disposer: IReactionDisposer[] = [];
+  disposerUser: IReactionDisposer[];
   ready: boolean = false;
   selecting: boolean = false;
   coolDown: boolean = false;
@@ -54,17 +61,10 @@ class User {
 
   registerSocket(ws: ws) {
     this.sockets.add(ws);
-    const dispose = autorun(() => this.send(Messages.USER_NAME, this.name));
-    const dispose2 = autorun(() => this.send(Messages.READY, this.ready));
-    const dispose3 = autorun(() =>
-      this.send(Messages.PUBLIC_ID, this.publicId)
-    );
 
     ws.on("close", () => {
       this.sockets.delete(ws);
-      dispose();
-      dispose2();
-      dispose3();
+      console.log("disconnected:", this.name, this.publicId);
     });
   }
 
@@ -90,13 +90,7 @@ class User {
     };
 
     this.disposer = Object.entries(connect).map(([message, key]) =>
-      autorun((event) => {
-        DEBUG &&
-          console.log(
-            "[send " + game.id + "]:",
-            message,
-            game[key as keyof Game]
-          );
+      autorun(() => {
         this.send(message, game[key as keyof Game]);
       })
     );
@@ -113,6 +107,8 @@ class User {
 
 decorate(User, {
   name: observable,
+  color: observable,
+  sockets: observable,
   ready: observable,
   selecting: observable,
   connected: computed,
@@ -125,3 +121,22 @@ decorate(User, {
 });
 
 export default User;
+
+let i = 0;
+function generateColorSet() {
+  const colors = [
+    "#f6d365",
+    "#fda085",
+    "#f093fb",
+    "#f5576c",
+    "#5ee7df",
+    "#b490ca",
+    "#c3cfe2",
+  ];
+  const color1 = colors[(i * 2) % colors.length];
+  const color2 =
+    colors[(i * 2 + 1 + Math.floor(i / colors.length)) % colors.length];
+
+  i++;
+  return [color1, color2];
+}

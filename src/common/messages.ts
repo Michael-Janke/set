@@ -21,6 +21,7 @@ export enum Messages {
   SELECTED_SET = "selectedSet",
   HIGHLIGHTED_CARDS = "highlightedCards",
   HIGHLIGHT_CARDS = "highlightCards",
+  OWNER = "owner",
 }
 
 export enum ErrorMessages {

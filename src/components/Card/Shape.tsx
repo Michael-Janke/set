@@ -1,4 +1,4 @@
-import { Shape, Color, Fill } from "../../Model/Card";
+import { Shape, Color, Fill } from "../../common/Card";
 import React from "react";
 
 interface ShapeSvgProps {
