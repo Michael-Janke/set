@@ -24,7 +24,7 @@ export default function CodeInput({
     return () => {
       window.removeEventListener("hashchange", updateCode);
     };
-  }, []);
+  }, [onChange]);
   return (
     <input
       className="codeInput"

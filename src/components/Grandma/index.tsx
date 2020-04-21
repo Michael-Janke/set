@@ -14,6 +14,7 @@ function Grandma() {
       autorun(() => {
         setOma(game.containsOma);
       }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 

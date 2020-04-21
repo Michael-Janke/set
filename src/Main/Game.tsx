@@ -1,7 +1,4 @@
-import React, { useContext } from "react";
-import Game from "Model/Game";
-import { useObserver } from "mobx-react";
-
+import React from "react";
 import "./GameLobby.css";
 import PlayerList from "components/PlayerList";
 import Deck from "components/Deck";

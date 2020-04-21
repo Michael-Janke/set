@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { GAME_ID_LENGTH } from "../common/gameStatus";
 import CodeInput from "components/CodeInput";
 

@@ -15,7 +15,7 @@ function PlayerList() {
   return (
     <div className="players">
       {transitions.map(({ item, props: { ...rest } }) => (
-        <Player id={item.id} style={rest} />
+        <Player key={item.id} id={item.id} style={rest} />
       ))}
     </div>
   );
