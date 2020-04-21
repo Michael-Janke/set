@@ -65,6 +65,7 @@ export default function websocket(ws: ws, req: express.Request) {
         DEBUG &&
           console.log("[received]:", "click", data, game && game.cards[data]);
         game && game.clickCard(data, user);
+        game && user.highlightCard(data);
         break;
       case Messages.START_GAME:
         DEBUG && console.log("[received]:", "game start request");

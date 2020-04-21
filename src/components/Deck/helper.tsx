@@ -11,7 +11,7 @@ export function getAllProductsOf(n: number) {
 }
 
 export function bestLayoutFor(n: number, ratio: number) {
-  const products = getAllProductsOf(n);
+  const products = getAllProductsOf(n).filter(([a, b]) => a >= 3 && b >= 3);
   const scoreOfProducts = products.map(([a, b]) =>
     Math.abs(a / b - ratio || 0)
   );
