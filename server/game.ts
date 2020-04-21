@@ -11,6 +11,7 @@ export type GameId = string;
 const SET_REFILL_DELAY = 3000;
 const NO_SET_REFILL_DELAY = 1000;
 const NO_SET_COOL_DOWN = 5000;
+const MAX_SELECT_TIME = 5000;
 
 const NORMAL_CARD_COUNT = 12;
 
@@ -25,6 +26,7 @@ class Game {
   deck: (number | null)[] = [];
   pile: number[] = [];
   selectedCards: number[] = [];
+  highlightedCardsMap = new Map<number, User>();
   status: string = GameStatus.LOBBY;
   id: GameId;
   owner: User;
@@ -55,37 +57,47 @@ class Game {
     }));
   }
 
+  get highlightedCards() {
+    const obj: { [key: string]: string[] } = {};
+    this.players.forEach((user) => {
+      if (user.highlightedCard === null) return;
+      obj[user.highlightedCard] = obj[user.highlightedCard] || [];
+      obj[user.highlightedCard].push(user.name.slice(0, 2));
+    });
+    return obj;
+  }
+
   clickCard(card: number, user: User) {
     if (!this.players.has(user))
       return user.send(Messages.ERROR, ErrorMessages.PERMISSION_DENIED);
 
-    if (user.coolDown) {
+    const someoneElseIsSelecting = [...this.players.values()].some(
+      (u) => u !== user && u.selecting
+    );
+
+    // block guard
+    if (user.coolDown || someoneElseIsSelecting) {
+      user.send(Messages.ERROR, ErrorMessages.CLICK_IS_BLOCKED);
       return user.send(Messages.SELECTED_CARDS, this.selectedCards);
     }
 
-    if (this.selectedCards.length === 0) {
+    if (!user.selecting) {
       user.selecting = true;
-      this.blockTimer = setTimeout(() => {
-        user.selecting = false;
-        this.selectedCards.length = 0;
-      }, 5000);
-    } else {
-      if (!user.selecting) {
-        return user.send(Messages.SELECTED_CARDS, this.selectedCards);
-      }
+      this.blockTimer = setTimeout(() => this.checkSet(user), MAX_SELECT_TIME);
     }
 
     this.selectedCards.indexOf(card) >= 0
       ? this.selectedCards.splice(this.selectedCards.indexOf(card), 1)
       : this.selectedCards.push(card);
 
-    this.checkSet(user);
+    if (this.selectedCards.length === 3) this.checkSet(user);
   }
 
   checkSet(user: User) {
-    if (this.selectedCards.length !== 3) return;
     const selectedCards = this.selectedCards.map((id) => this.cards[id]);
-    const isSet2 = isSet(selectedCards[0], selectedCards[1], selectedCards[2]);
+    const isSet2 =
+      this.selectedCards.length === 3 &&
+      isSet(selectedCards[0], selectedCards[1], selectedCards[2]);
 
     if (isSet2) {
       user.statistics.sets++;
@@ -213,6 +225,7 @@ decorate(Game, {
   cards: observable,
   deck: observable,
   selectedCards: observable,
+  highlightedCards: computed,
   status: observable,
   players: observable,
   clickCard: action,

@@ -46,7 +46,7 @@ export default function ShapeSvg({ shape, color, fill }: ShapeSvgProps) {
     [Fill.None]: undefined,
   };
   return (
-    <svg width="200" viewBox="-5 -5 70 30">
+    <svg viewBox="-5 -5 70 30">
       {fill === Fill.Dotted && <CrossHatch color={colors[color]} />}
       <path
         stroke={colors[color]}

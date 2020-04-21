@@ -50,6 +50,7 @@ class Game {
 
         case Messages.SELECTED_CARDS:
           observable(this.selectedCards).replace(data);
+          SoundPool.play(Sounds.CLICK);
           break;
 
         case Messages.STATUS:
@@ -60,6 +61,7 @@ class Game {
         case Messages.USER_NAME:
           this.userName = data;
           break;
+
         case Messages.PUBLIC_ID:
           this.publicId = data;
           break;
@@ -79,6 +81,7 @@ class Game {
 
         case Messages.ERROR:
           this.error = data;
+          SoundPool.play(Sounds.ERROR);
           window.setTimeout(() => {
             if (this.error === data) this.error = undefined;
           }, 5000);
@@ -86,6 +89,11 @@ class Game {
 
         case Messages.SELECTED_SET:
           SoundPool.play(data ? Sounds.SUCCESS : Sounds.FAILURE);
+          break;
+
+        case Messages.HIGHLIGHTED_CARDS:
+          this.highlightedCards = data;
+          break;
 
         default:
           break;
@@ -121,6 +129,8 @@ class Game {
     selecting: boolean;
     owner: boolean;
   }[] = [];
+
+  highlightedCards: { [key: string]: string[] } = {};
 
   selectCard(i: number) {
     if (!this.ws || !this.connected) return;
@@ -173,6 +183,11 @@ class Game {
     if (!this.ws || !this.connected) return;
     this.ws.send(JSON.stringify([Messages.KICK, id]));
   }
+
+  highlightCard(cardNumber: number) {
+    if (!this.ws || !this.connected) return;
+    this.ws.send(JSON.stringify([Messages.HIGHLIGHT_CARDS, cardNumber]));
+  }
 }
 
 decorate(Game, {
@@ -196,6 +211,7 @@ decorate(Game, {
   setReadiness: action,
   ready: observable,
   publicId: observable,
+  highlightedCards: observable,
 });
 
 export default createContext(new Game());
@@ -203,7 +219,7 @@ export default createContext(new Game());
 function uuidv4() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
     var r = (Math.random() * 16) | 0,
-      v = c == "x" ? r : (r & 0x3) | 0x8;
+      v = c === "x" ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }

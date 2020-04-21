@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./CodeInput.scss";
 import { GAME_ID_CHARACTERS, GAME_ID_LENGTH } from "common/gameStatus";
 
@@ -17,9 +17,11 @@ export default function CodeInput({
   onChange: (value: string) => void;
   onEnter: (() => void) | undefined;
 }) {
-  if (value !== codeFilter(value)) {
-    onChange(codeFilter(value));
-  }
+  useEffect(() => {
+    if (value !== codeFilter(value)) {
+      onChange(codeFilter(value));
+    }
+  }, []);
   return (
     <input
       className="codeInput"

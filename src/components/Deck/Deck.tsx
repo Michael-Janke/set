@@ -1,20 +1,21 @@
 import React, { useEffect, useContext, useLayoutEffect, useState } from "react";
 import { useSprings, animated, interpolate } from "react-spring";
-
-import { useObserver, observer } from "mobx-react";
-import { autorun, reaction, observe, IObjectDidChange } from "mobx";
+import { reaction, observe } from "mobx";
 
 import "./Deck.css";
 import Card from "../Card";
 import Game from "../../Model/Game";
+import CardHighlightIndicator from "components/CardHighlightIndicator";
 
 const Deck = ({
   onSelect,
+  onHover,
   width,
   cols,
   parentWidth,
 }: {
   onSelect: (i: number) => void;
+  onHover?: (i: number) => void;
   width: number;
   cols: number;
   rows: number;
@@ -43,8 +44,8 @@ const Deck = ({
     from: { x: 0, y: 0, opacity: 0 },
   }));
 
-  const update = (event?: IObjectDidChange) => {
-    set((i) => {
+  const update = () => {
+    set((i: number) => {
       const active = deck.indexOf(i) >= 0;
       if (!active) return { opacity: 0, z: 0, x: -width, y: -width * 1.5 };
       const isSelectedCards = selectedCards.indexOf(i) >= 0;
@@ -95,8 +96,10 @@ const Deck = ({
               ),
             }}
             onClick={() => onSelect(i)}
+            onMouseEnter={onHover && (() => onHover(i))}
           >
             <Card card={cards[i]} />
+            <CardHighlightIndicator card={cards[i]} />
           </animated.div>
         );
       })}

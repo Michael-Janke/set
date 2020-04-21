@@ -108,6 +108,10 @@ export default function websocket(ws: ws, req: express.Request) {
         }
         break;
 
+      case Messages.HIGHLIGHT_CARDS:
+        user.highlightCard(data);
+        break;
+
       default:
         console.warn("[received]:", "unhandled message", msg);
     }

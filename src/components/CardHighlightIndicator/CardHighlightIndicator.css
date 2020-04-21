@@ -1,0 +1,16 @@
+.highligt-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  font-size: 8px;
+  color: white;
+}
+
+.highligt-indicator .initials {
+  border-radius: 100%;
+  width: 10px;
+  height: 10px;
+  line-height: 10px;
+  background-color: #00000033;
+  transform: translate3d(0px, 0px, 2px);
+}

@@ -15,6 +15,8 @@ import Statistics from "./statistics";
 const names = ["Captain America", "Ironman", "Superman", "Batman", "Flash"];
 let lastIndex = 0;
 
+const HIGHLIGHT_DURATION = 3000;
+
 export type UserId = string;
 
 class User {
@@ -32,6 +34,17 @@ class User {
   coolDown: boolean = false;
   coolDownTimer: NodeJS.Timeout | null = null;
   statistics = new Statistics();
+  highlightedCard: string | null = null;
+  highlightedCardTimer: NodeJS.Timeout | null = null;
+
+  highlightCard(card: string) {
+    this.highlightedCardTimer && clearTimeout(this.highlightedCardTimer);
+    this.highlightedCard = card;
+    this.highlightedCardTimer = setTimeout(
+      () => (this.highlightedCard = null),
+      HIGHLIGHT_DURATION
+    );
+  }
 
   startCoolDown(duration: number) {
     this.coolDownTimer && clearTimeout(this.coolDownTimer);
@@ -73,6 +86,7 @@ class User {
       [Messages.STATUS]: "status",
       [Messages.GAME_ID]: "id",
       [Messages.PLAYERS]: "playerList",
+      [Messages.HIGHLIGHTED_CARDS]: "highlightedCards",
     };
 
     this.disposer = Object.entries(connect).map(([message, key]) =>
@@ -106,6 +120,8 @@ decorate(User, {
   statistics: observable,
   coolDown: observable,
   startCoolDown: action,
+  highlightedCard: observable,
+  highlightCard: action,
 });
 
 export default User;

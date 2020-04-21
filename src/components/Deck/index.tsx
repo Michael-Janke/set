@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
 import useMeasure from "react-use-measure";
-import { observer, Observer } from "mobx-react";
 import { reaction } from "mobx";
 
 import Game from "../../Model/Game";
@@ -36,6 +35,7 @@ const DeckContainer = () => {
           width={width}
           parentWidth={bounds.width}
           onSelect={(i) => game.selectCard(i)}
+          onHover={(i) => setTimeout(() => game.highlightCard(i))}
         />
       )}
     </div>

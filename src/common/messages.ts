@@ -19,12 +19,15 @@ export enum Messages {
   READY = "ready",
   KICK = "kick",
   SELECTED_SET = "selectedSet",
+  HIGHLIGHTED_CARDS = "highlightedCards",
+  HIGHLIGHT_CARDS = "highlightCards",
 }
 
 export enum ErrorMessages {
   GAME_NOT_EXIST = "GAME_NOT_EXIST",
   PERMISSION_DENIED = "PERMISSION_DENIED",
   NOT_ALL_PLAYERS_READY = "NOT_ALL_PLAYERS_READY",
+  CLICK_IS_BLOCKED = "CLICK_IS_BLOCKED",
 }
 
 export const ErrorText: {
@@ -34,5 +37,6 @@ export const ErrorText: {
     GAME_NOT_EXIST: "Das Spiel existiert nicht",
     PERMISSION_DENIED: "Fehlende Berechtigung",
     NOT_ALL_PLAYERS_READY: "Nicht alle Spieler sind bereit",
+    CLICK_IS_BLOCKED: "Du musst leider warten",
   },
 };

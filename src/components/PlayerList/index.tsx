@@ -20,7 +20,7 @@ function PlayerList() {
   return (
     <div className="players">
       {transitions.map(({ item, props: { ...rest } }) => (
-        <Observer>
+        <Observer key={item.id}>
           {() => {
             const player = game.players.find((player) => player.id === item.id);
             const owner = game.players.find((player) => player.owner);
