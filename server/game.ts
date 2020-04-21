@@ -13,6 +13,7 @@ const SET_REFILL_DELAY = 3000;
 const NO_SET_REFILL_DELAY = 1000;
 const NO_SET_COOL_DOWN = 5000;
 const MAX_SELECT_TIME = 5000;
+const TIPP_WAIT_TIME = 30000;
 
 const NORMAL_CARD_COUNT = 12;
 
@@ -102,19 +103,19 @@ class Game {
     if (this.selectedCards.length === 3) this.checkSet(user);
   }
 
-  checkSet(user: User) {
+  checkSet(user: User | null) {
     const selectedCards = this.selectedCards.map((id) => this.cards[id]);
     const isSet2 =
       this.selectedCards.length === 3 &&
       isSet(selectedCards[0], selectedCards[1], selectedCards[2]);
 
     if (isSet2) {
-      user.statistics.sets++;
+      user && user.statistics.sets++;
     } else {
-      user.statistics.fails++;
+      user && user.statistics.fails++;
     }
 
-    if (!isSet2) {
+    if (!isSet2 && user) {
       user.startCoolDown(NO_SET_COOL_DOWN);
     }
 
@@ -131,7 +132,7 @@ class Game {
           });
           this.fillDeck();
         }
-        user.selecting = false;
+        if (user) user.selecting = false;
         this.selectedCards.length = 0;
       }),
       isSet2 ? SET_REFILL_DELAY : NO_SET_REFILL_DELAY
@@ -142,6 +143,7 @@ class Game {
   endGame() {
     this.status = GameStatus.FINISHED;
     this.players.forEach((player) => (player.ready = false));
+    this.resetTippTimer(true);
   }
 
   fillDeck() {
@@ -180,8 +182,8 @@ class Game {
 
   deckContainsSet() {
     const deck = this.deck.filter((card) => card !== null) as number[];
-    if (deck.length < 3) return false;
-    return getCombinations(deck, 3).some((combination) =>
+    if (deck.length < 3) return undefined;
+    return getCombinations(deck, 3).find((combination) =>
       isSet(
         this.cards[combination[0]],
         this.cards[combination[1]],
@@ -203,6 +205,30 @@ class Game {
     this.fillDeck();
     this.players.forEach((user) => (user.statistics = new Statistics()));
     this.status = GameStatus.RUNNING;
+    this.resetTippTimer();
+  }
+
+  tippIsAvailable = false;
+  tippTimer: NodeJS.Timeout | null = null;
+  tippIndex = 0;
+  sendTipp() {
+    if (!this.tippIsAvailable) return;
+    const set = this.deckContainsSet();
+    if (set) {
+      this.selectedCards.push(set[this.tippIndex++ % set.length]);
+      if (this.selectedCards.length === 3) this.checkSet(null);
+    }
+    this.resetTippTimer();
+  }
+
+  resetTippTimer(stop = false) {
+    this.tippIsAvailable = false;
+    this.tippTimer && clearTimeout(this.tippTimer);
+    if (stop) return;
+    this.tippTimer = setTimeout(
+      () => (this.tippIsAvailable = true),
+      TIPP_WAIT_TIME
+    );
   }
 
   generateFullDeck() {
@@ -242,6 +268,8 @@ decorate(Game, {
   startGame: action,
   endGame: action,
   playerList: computed,
+  tippIsAvailable: observable,
+  sendTipp: action,
 });
 
 export default Game;

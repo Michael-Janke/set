@@ -23,6 +23,8 @@ export enum Messages {
   HIGHLIGHTED_CARDS = "highlightedCards",
   HIGHLIGHT_CARDS = "highlightCards",
   OWNER = "owner",
+  TIPP_AVAILABLE = "tippAvailable",
+  SEND_TIPP = "sendTipp",
 }
 
 export enum ErrorMessages {

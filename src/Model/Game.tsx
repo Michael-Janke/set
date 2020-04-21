@@ -92,6 +92,9 @@ class Game {
           this.highlightedCards = data;
           break;
 
+        case Messages.TIPP_AVAILABLE:
+          this.tippIsAvailable = data;
+
         default:
           break;
       }
@@ -118,6 +121,7 @@ class Game {
   players: PublicUser[] = [];
 
   highlightedCards: { [key: string]: string[] } = {};
+  tippIsAvailable = false;
 
   get userName() {
     return this.players.find((p) => p.id === this.publicId)?.name || "loading";
@@ -191,6 +195,11 @@ class Game {
     if (!this.ws || !this.connected) return;
     this.ws.send(JSON.stringify([Messages.HIGHLIGHT_CARDS, cardNumber]));
   }
+
+  sendTipp() {
+    if (!this.ws || !this.connected) return;
+    this.ws.send(JSON.stringify([Messages.SEND_TIPP]));
+  }
 }
 
 decorate(Game, {
@@ -215,6 +224,7 @@ decorate(Game, {
   ready: computed,
   publicId: observable,
   highlightedCards: observable,
+  tippIsAvailable: observable,
 });
 
 export default createContext(new Game());

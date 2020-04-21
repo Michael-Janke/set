@@ -129,6 +129,10 @@ export default function websocket(ws: ws, req: express.Request) {
         user.highlightCard(data);
         break;
 
+      case Messages.SEND_TIPP:
+        game?.sendTipp();
+        break;
+
       default:
         console.warn("[received]:", "unhandled message", msg);
     }

@@ -87,6 +87,7 @@ class User {
       [Messages.GAME_ID]: "id",
       [Messages.PLAYERS]: "playerList",
       [Messages.HIGHLIGHTED_CARDS]: "highlightedCards",
+      [Messages.TIPP_AVAILABLE]: "tippIsAvailable",
     };
 
     this.disposer = Object.entries(connect).map(([message, key]) =>

@@ -11,9 +11,15 @@ function GameControl() {
 
   return (
     <div className="game-control">
-      <Button small={true} green={true}>
-        <span className="game-code">{game.gameId}</span>
-      </Button>
+      {game.tippIsAvailable ? (
+        <Button small={true} green={true} onClick={() => game.sendTipp()}>
+          Tipp
+        </Button>
+      ) : (
+        <Button small={true} green={true}>
+          <span className="game-code">{game.gameId}</span>
+        </Button>
+      )}
 
       {owner && (
         <Button small={true} onClick={() => game.endGame()}>
