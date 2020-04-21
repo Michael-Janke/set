@@ -7,6 +7,7 @@ import PlayerList from "components/PlayerList";
 import ReadyButton from "components/ReadyButton";
 import { ErrorMessages } from "common/messages";
 import Error from "components/Error";
+import Button from "components/Button";
 
 export default function Lobby() {
   const game = useContext(Game);
@@ -14,27 +15,13 @@ export default function Lobby() {
   return useObserver(() => (
     <div className="lobby">
       <div className="box">
-        <div className="text">Der Spielcode lautet</div>
+        <div className="text">Der Spielcode</div>
         <div>
           <span className="game-id">{game.gameId}</span>
         </div>
-        <span className="explain">
-          Spieler mit diesem Link einladen:{" "}
-          <input
-            className="link"
-            value={window.location.href}
-            readOnly={true}
-            autoFocus={true}
-            onClick={(event) => {
-              (event.target as HTMLInputElement).select();
-              (event.target as HTMLInputElement).setSelectionRange(
-                0,
-                99999
-              ); /*For mobile devices*/
-              document.execCommand("copy");
-            }}
-          />
-        </span>
+        <Button onClick={() => copyStringToClipboard(window.location.href)}>
+          Link kopieren
+        </Button>
       </div>
 
       <div className="centered-row">
@@ -51,17 +38,36 @@ export default function Lobby() {
       </div>
 
       <div className="box">
-        <div className="text" style={{ paddingBottom: 15 }}>
-          Spieler in der Lobby
-        </div>
+        <div className="text">Die Lobby</div>
 
         <PlayerList />
 
         <Error filter={ErrorMessages.NOT_ALL_PLAYERS_READY} />
-        <div className="button button-create" onClick={() => game.startGame()}>
-          <span>Spiel starten</span>
-        </div>
+        <Button
+          onClick={() => game.startGame()}
+          green={game.players.every((p) => p.ready)}
+        >
+          Spiel starten
+        </Button>
       </div>
     </div>
   ));
+}
+
+function copyStringToClipboard(str: string) {
+  // Temporäres Element erzeugen
+  var el = document.createElement("textarea");
+  // Den zu kopierenden String dem Element zuweisen
+  el.value = str;
+  // Element nicht editierbar setzen und aus dem Fenster schieben
+  el.setAttribute("readonly", "");
+  el.style.position = "absolute";
+  el.style.left = "-9999px";
+  document.body.appendChild(el);
+  // Text innerhalb des Elements auswählen
+  el.select();
+  // Ausgewählten Text in die Zwischenablage kopieren
+  document.execCommand("copy");
+  // Temporäres Element löschen
+  document.body.removeChild(el);
 }

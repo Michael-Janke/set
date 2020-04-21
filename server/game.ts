@@ -141,6 +141,7 @@ class Game {
 
   endGame() {
     this.status = GameStatus.FINISHED;
+    this.players.forEach((player) => (player.ready = false));
   }
 
   fillDeck() {

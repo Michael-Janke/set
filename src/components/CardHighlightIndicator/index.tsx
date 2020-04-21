@@ -4,7 +4,7 @@ import Game from "Model/Game";
 import { observer } from "mobx-react";
 
 import "./CardHighlightIndicator.css";
-import { background } from "components/PlayerList";
+import { background } from "components/Player";
 
 const CardHighlightIndicator = ({ card }: { card: Card }) => {
   const game = useContext(Game);
@@ -16,11 +16,7 @@ const CardHighlightIndicator = ({ card }: { card: Card }) => {
           <div
             key={id}
             className="initials"
-            style={background(
-              player?.color || ["red", "green"],
-              !!player?.selecting,
-              !player?.connected
-            )}
+            style={background(player?.color || ["red", "green"], false, false)}
           >
             {(player?.name || "❤")[0].toLocaleUpperCase()}
           </div>

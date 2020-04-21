@@ -3,6 +3,7 @@ import failure from "./failure.mp3";
 import error from "./error.mp3";
 import click from "./click.mp3";
 import deck from "./deck.mp3";
+import endGame from "./endGame.mp3";
 
 export enum Sounds {
   SUCCESS = "success",
@@ -10,6 +11,7 @@ export enum Sounds {
   ERROR = "error",
   CLICK = "click",
   DECK = "deck",
+  ENDGAME = "endGame",
 }
 
 class SoundPool {
@@ -19,6 +21,7 @@ class SoundPool {
     error,
     click,
     deck,
+    endGame,
   };
   player: { [key: string]: HTMLAudioElement } = {};
   initiated = false;

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import "./CodeInput.scss";
 import { GAME_ID_CHARACTERS, GAME_ID_LENGTH } from "common/gameStatus";
 
-const codeFilter = (code: string) =>
+export const codeFilter = (code: string) =>
   code
     .toUpperCase()
     .replace(RegExp(`[^${GAME_ID_CHARACTERS}]`, "g"), "")
@@ -18,10 +18,12 @@ export default function CodeInput({
   onEnter: (() => void) | undefined;
 }) {
   useEffect(() => {
-    if (value !== codeFilter(value)) {
-      onChange(codeFilter(value));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const updateCode = () => onChange(codeFilter(window.location.hash));
+    updateCode();
+    window.addEventListener("hashchange", updateCode, false);
+    return () => {
+      window.removeEventListener("hashchange", updateCode);
+    };
   }, []);
   return (
     <input

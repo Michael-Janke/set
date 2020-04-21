@@ -95,7 +95,13 @@ const Deck = ({
                     0 10px 10px -10px rgba(50, 50, 73, 0.3)`
               ),
             }}
-            onClick={() => onSelect(i)}
+            onTouchStart={() => {
+              onSelect(i);
+            }}
+            onTouchEnd={(e) => e.preventDefault()}
+            onMouseDown={() => {
+              onSelect(i);
+            }}
             onMouseEnter={onHover && (() => onHover(i))}
           >
             <Card card={cards[i]} />

@@ -60,7 +60,7 @@ class Game {
         case Messages.STATUS:
           this.status = data as GameStatus;
           SoundPool.init();
-
+          this.status === GameStatus.FINISHED && SoundPool.play(Sounds.ENDGAME);
           break;
 
         case Messages.PUBLIC_ID:
@@ -145,6 +145,11 @@ class Game {
   startGame() {
     if (!this.ws || !this.connected) return;
     this.ws.send(JSON.stringify([Messages.START_GAME]));
+  }
+
+  endGame() {
+    if (!this.ws || !this.connected) return;
+    this.ws.send(JSON.stringify([Messages.END_GAME]));
   }
 
   createGame() {

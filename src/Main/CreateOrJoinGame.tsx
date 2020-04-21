@@ -6,26 +6,17 @@ import "./CreateOrJoinGame.css";
 import { ErrorMessages } from "common/messages";
 import Game from "Model/Game";
 import Error from "components/Error";
+import Button from "components/Button";
 
 export default function CreateOrJoinGame() {
   const [code, setCode] = useState(window.location.hash);
-  useEffect(() => {
-    const updateCode = () => setCode(window.location.hash);
-
-    window.addEventListener("hashchange", updateCode, false);
-    return () => {
-      window.removeEventListener("hashchange", updateCode);
-    };
-  }, []);
   const game = useContext(Game);
 
   return (
     <div className="container">
       <div className="box">
         <div className="text">Ein neues Spiel erstellen</div>
-        <div className="button button-create" onClick={() => game.createGame()}>
-          <span>Spiel erstellen</span>
-        </div>
+        <Button onClick={() => game.createGame()}>Spiel erstellen</Button>
       </div>
 
       <div className="box">
@@ -42,12 +33,7 @@ export default function CreateOrJoinGame() {
         />
 
         {code.length === GAME_ID_LENGTH && (
-          <div
-            className="button button-create"
-            onClick={() => game.joinGame(code)}
-          >
-            <span>Spiel beitreten</span>
-          </div>
+          <Button onClick={() => game.joinGame(code)}>Spiel beitreten</Button>
         )}
       </div>
     </div>

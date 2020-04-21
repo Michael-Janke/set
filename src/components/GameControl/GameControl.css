@@ -1,0 +1,11 @@
+.game-control {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.game-control .game-code {
+  font-family: droid sans mono, consolas, monospace;
+  letter-spacing: 0.3rem;
+}

@@ -5,11 +5,15 @@ import Game from "Model/Game";
 import "./ReadyButton.css";
 import ReadyIcon from "components/ReadyIcon";
 
-const ReadyButton = () => {
+const ReadyButton: React.FC<{ [key: string]: any }> = (props) => {
   const game = useContext(Game);
   return (
     <div
-      className={"ready-button-container " + (game.ready ? "" : "not-ready")}
+      {...props}
+      className={
+        "ready-button-container " +
+        (game.ready ? "" : "not-ready " + props.className)
+      }
       onClick={() => game.setReadiness(!game.ready)}
     >
       <span className="ready-button-text">

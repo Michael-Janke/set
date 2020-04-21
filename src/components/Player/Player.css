@@ -1,0 +1,48 @@
+.player-container {
+  width: 200px;
+}
+
+.kick-button {
+  margin-top: -10px;
+  cursor: pointer;
+}
+
+.player {
+  overflow: hidden;
+  pointer-events: auto;
+  border-radius: 5px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem;
+}
+
+.player > * {
+  margin-right: 5px;
+}
+
+.player > :last-child {
+  margin-right: 0px;
+}
+
+.player .ready-icon {
+  font-size: 0.5em;
+}
+
+.player .ready-icon > span {
+  background-color: white;
+}
+
+.name-container {
+  font-size: 1em;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fail {
+  color: rgb(255, 255, 255, 0.4);
+  font-size: 80%;
+}

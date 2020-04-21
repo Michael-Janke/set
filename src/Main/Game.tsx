@@ -7,24 +7,17 @@ import PlayerList from "components/PlayerList";
 import Deck from "components/Deck";
 
 import "./Game.css";
+import GameControl from "components/GameControl";
 
 export default function Lobby() {
-  const game = useContext(Game);
-
-  return useObserver(() => (
+  return (
     <div className="game-container">
       <div className="game-bar">
         <PlayerList />
-        <div
-          className="button button-create small close-button"
-          onClick={() => game.leaveGame()}
-        >
-          <span>x</span>
-        </div>
+        <GameControl />
       </div>
-      <div className="deck">
-        <Deck />
-      </div>
+
+      <Deck />
     </div>
-  ));
+  );
 }

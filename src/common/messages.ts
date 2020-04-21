@@ -5,6 +5,7 @@ export enum Messages {
   STATUS = "status",
   CLICK_CARD = "clickCard",
   START_GAME = "startGame",
+  END_GAME = "endGame",
   CREATE_GAME = "createGame",
   JOIN_GAME = "joinGame",
   ABORT_GAME = "abortGame",

@@ -4,7 +4,8 @@
 }
 
 .input {
-  width: 150px;
+  width: 100%;
+  height: 100%;
   background: #fff;
   color: #a3a3a3;
   font: inherit;
@@ -16,9 +17,13 @@
 }
 
 .input-container {
+  min-width: 200px;
+  max-width: 500px;
+  height: 50px;
+  width: 100%;
   position: relative;
   display: inline-block;
-  margin: 0px 30px 15px;
+  flex: 1;
 }
 
 .label {
@@ -65,4 +70,12 @@
   align-items: center;
   justify-content: space-evenly;
   flex-wrap: wrap;
+  padding: 5vmin;
+  margin: -2.5vmin;
+  padding-bottom: 0px;
+}
+
+.centered-row > * {
+  flex: 1;
+  margin: 2.5vmin;
 }

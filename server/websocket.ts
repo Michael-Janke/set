@@ -96,6 +96,11 @@ export default function websocket(ws: ws, req: express.Request) {
         if (!game || game.owner !== user) break;
         matching.abortGame(game);
         break;
+      case Messages.END_GAME:
+        DEBUG && console.log("[received]:", "end game");
+        if (!game || game.owner !== user) break;
+        game.endGame();
+        break;
       case Messages.USER_NAME:
         DEBUG && console.log("[received]:", "new user name", data);
         user.name = data;
