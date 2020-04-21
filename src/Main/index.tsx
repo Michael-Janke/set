@@ -11,7 +11,6 @@ import Finished from "./Finished";
 
 export default function Main() {
   const game = useContext(Game);
-
   return (
     <div className="main">
       {useObserver(() => (

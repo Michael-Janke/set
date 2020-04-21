@@ -291,6 +291,7 @@ decorate(Game, {
   tippIsAvailable: observable,
   sendTipp: action,
   containsOma: observable,
+  checkSet: action,
 });
 
 export default Game;
