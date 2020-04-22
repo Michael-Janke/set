@@ -30,6 +30,7 @@
   color: white;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   transition: ease-in-out 0.5s background-color;
+  cursor: pointer;
 }
 
 .ready-button-container.not-ready {

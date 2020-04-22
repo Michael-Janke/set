@@ -23,6 +23,8 @@ The player who found a set first gets a point
 
 - **set** game logic
 - multiplayer via browser (websockets)
+- responsive
+- touch enabled
 - game matching via 4 character code
 - sounds for card click, set, no set, game end, draw cards
 - you can ask for a tip
