@@ -42,7 +42,8 @@ function Player({ id, style }: PlayerProps) {
         )}
         {game.status === GameStatus.RUNNING && <Score score={player.sets} />}
       </animated.div>
-      {game.status === GameStatus.FINISHED &&
+      {(game.status === GameStatus.LOBBY ||
+        game.status === GameStatus.FINISHED) &&
         owner &&
         player &&
         game.publicId === owner.id &&

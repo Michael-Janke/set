@@ -1,6 +1,7 @@
 .lobby {
   max-width: 1000px;
   margin: auto;
+  margin-bottom: 5vmin;
 }
 
 .input {
@@ -45,6 +46,7 @@
   font: 5ch droid sans mono, consolas, monospace;
   letter-spacing: 1ch;
   padding-left: 1ch;
+  margin-bottom: 15px;
 }
 
 .link {
@@ -78,4 +80,24 @@
 .centered-row > * {
   flex: 1;
   margin: 2.5vmin;
+}
+
+.button-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.lobby .player,
+.lobby .players,
+.lobby .player-container {
+  width: 100% !important;
+}
+
+.lobby .button {
+  margin: 5px;
 }

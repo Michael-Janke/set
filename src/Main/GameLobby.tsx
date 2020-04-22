@@ -16,12 +16,29 @@ export default function Lobby() {
     <div className="lobby">
       <div className="box">
         <div className="text">Der Spielcode</div>
-        <div>
-          <span className="game-id">{game.gameId}</span>
+
+        <div className="game-id">{game.gameId}</div>
+        <div className="button-row">
+          <Button
+            green={true}
+            onClick={() => copyStringToClipboard(window.location.href)}
+          >
+            Link in Ablage kopieren
+          </Button>
+          <Button
+            green={true}
+            onClick={() =>
+              window.open(
+                "https://wa.me/?text=" +
+                  encodeURIComponent(
+                    "Spiel mit mir ne Runde Set. " + window.location.href
+                  )
+              )
+            }
+          >
+            Per WhatsApp einladen
+          </Button>
         </div>
-        <Button onClick={() => copyStringToClipboard(window.location.href)}>
-          Link kopieren
-        </Button>
       </div>
 
       <div className="centered-row">
@@ -43,12 +60,15 @@ export default function Lobby() {
         <PlayerList />
 
         <Error filter={ErrorMessages.NOT_ALL_PLAYERS_READY} />
-        <Button
-          onClick={() => game.startGame()}
-          green={game.players.every((p) => p.ready)}
-        >
-          Spiel starten
-        </Button>
+        <div className="button-row">
+          <Button onClick={() => game.leaveGame()}>Spiel verlassen</Button>
+          <Button
+            onClick={() => game.startGame()}
+            green={game.players.every((p) => p.ready)}
+          >
+            Spiel starten
+          </Button>
+        </div>
       </div>
     </div>
   ));
