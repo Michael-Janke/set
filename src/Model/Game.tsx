@@ -76,6 +76,10 @@ class Game {
           observable(this.players).replace(data);
           break;
 
+        case Messages.ALL_PLAYERS_READY:
+          if (data) SoundPool.play(Sounds.READY);
+          break;
+
         case Messages.ERROR:
           this.error = data;
           SoundPool.play(Sounds.ERROR);
@@ -185,6 +189,8 @@ class Game {
   setName(name: string) {
     if (!this.ws || !this.connected) return;
     this.ws.send(JSON.stringify([Messages.USER_NAME, name]));
+    const user = this.players.find((p) => p.id === this.publicId);
+    if (user) user.name = name;
   }
 
   setReadiness(ready: boolean) {

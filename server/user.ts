@@ -69,7 +69,10 @@ class User {
   }
 
   send(message: string, data: any) {
-    this.sockets.forEach((ws) => ws.send(JSON.stringify([message, data])));
+    this.sockets.forEach(
+      (ws) =>
+        ws.readyState === ws.OPEN && ws.send(JSON.stringify([message, data]))
+    );
   }
 
   disconnectFromGame() {
@@ -89,16 +92,13 @@ class User {
       [Messages.HIGHLIGHTED_CARDS]: "highlightedCards",
       [Messages.TIPP_AVAILABLE]: "tippIsAvailable",
       [Messages.CONTAINS_OMA]: "containsOma",
+      [Messages.ALL_PLAYERS_READY]: "allPlayersReady",
     };
 
     this.disposer = Object.entries(connect).map(([message, key]) =>
       autorun(() => {
         this.send(message, game[key as keyof Game]);
       })
-    );
-
-    this.sockets.forEach((ws) =>
-      ws.on("close", () => this.disconnectFromGame())
     );
   }
 

@@ -80,6 +80,12 @@ class Game {
     return obj;
   }
 
+  get allPlayersReady() {
+    let allReady = true;
+    this.players.forEach((p) => (allReady = allReady && p.ready));
+    return allReady;
+  }
+
   clickCard(card: number, user: User) {
     if (!this.players.has(user))
       return user.send(Messages.ERROR, ErrorMessages.PERMISSION_DENIED);
@@ -175,6 +181,7 @@ class Game {
       }
     }
     this.checkOma();
+    this.resetTippTimer();
   }
 
   checkExtraCards() {
@@ -221,9 +228,11 @@ class Game {
       return;
     }
     this.deck.length = 0;
+    this.selectedCards.length = 0;
     this.pile = shuffleArray(Array.from(this.cards.keys()));
-    this.fillDeck();
     this.players.forEach((user) => (user.statistics = new Statistics()));
+
+    this.fillDeck();
     this.status = GameStatus.RUNNING;
     this.resetTippTimer();
   }
@@ -292,6 +301,7 @@ decorate(Game, {
   sendTipp: action,
   containsOma: observable,
   checkSet: action,
+  allPlayersReady: computed,
 });
 
 export default Game;
