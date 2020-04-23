@@ -5,6 +5,7 @@ import click from "./click.mp3";
 import deck from "./deck.mp3";
 import endGame from "./endGame.mp3";
 import ready from "./ready.mp3";
+import beep from "./beep.mp3";
 
 export enum Sounds {
   SUCCESS = "success",
@@ -14,6 +15,7 @@ export enum Sounds {
   DECK = "deck",
   ENDGAME = "endGame",
   READY = "ready",
+  BEEP = "beep",
 }
 
 class SoundPool {
@@ -25,6 +27,7 @@ class SoundPool {
     deck,
     endGame,
     ready,
+    beep,
   };
   player: { [key: string]: HTMLAudioElement } = {};
   initiated = false;

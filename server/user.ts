@@ -77,7 +77,6 @@ class User {
 
   disconnectFromGame() {
     this.disposer.forEach((dispose) => dispose());
-    this.ready = false;
   }
 
   connectToGame(game: Game) {
@@ -93,6 +92,7 @@ class User {
       [Messages.TIPP_AVAILABLE]: "tippIsAvailable",
       [Messages.CONTAINS_OMA]: "containsOma",
       [Messages.ALL_PLAYERS_READY]: "allPlayersReady",
+      [Messages.COUNTDOWN]: "countdown",
     };
 
     this.disposer = Object.entries(connect).map(([message, key]) =>

@@ -58,9 +58,14 @@ class Game {
           break;
 
         case Messages.STATUS:
+          if (
+            this.status === GameStatus.RUNNING &&
+            data === GameStatus.FINISHED
+          )
+            SoundPool.play(Sounds.ENDGAME);
           this.status = data as GameStatus;
           SoundPool.init();
-          this.status === GameStatus.FINISHED && SoundPool.play(Sounds.ENDGAME);
+
           break;
 
         case Messages.PUBLIC_ID:
@@ -77,7 +82,9 @@ class Game {
           break;
 
         case Messages.ALL_PLAYERS_READY:
-          if (data) SoundPool.play(Sounds.READY);
+          if (this.allPlayersReady === false && data === true)
+            SoundPool.play(Sounds.READY);
+          this.allPlayersReady = data;
           break;
 
         case Messages.ERROR:
@@ -102,6 +109,11 @@ class Game {
 
         case Messages.CONTAINS_OMA:
           this.containsOma = data;
+          break;
+
+        case Messages.COUNTDOWN:
+          this.countdown = data;
+          if (parseInt(this.countdown) > 0) SoundPool.play(Sounds.BEEP);
           break;
 
         default:
@@ -132,9 +144,11 @@ class Game {
   highlightedCards: { [key: string]: string[] } = {};
   tippIsAvailable = false;
   containsOma = false;
+  allPlayersReady: boolean | undefined;
+  countdown = "3";
 
   get userName() {
-    return this.players.find((p) => p.id === this.publicId)?.name || "loading";
+    return this.players.find((p) => p.id === this.publicId)?.name || "";
   }
 
   get ready() {
@@ -236,6 +250,7 @@ decorate(Game, {
   highlightedCards: observable,
   tippIsAvailable: observable,
   containsOma: observable,
+  countdown: observable,
 });
 
 export default createContext(new Game());

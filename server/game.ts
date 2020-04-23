@@ -44,6 +44,7 @@ class Game {
   blockTimer: NodeJS.Timeout | undefined;
 
   lastSetTime = Date.now();
+  countdown = "0";
 
   join(user: User) {
     this.players.add(user);
@@ -225,7 +226,7 @@ class Game {
     );
   }
 
-  startGame(user: User) {
+  startGame() {
     if (this.status === GameStatus.RUNNING) return;
     if (!Array.from(this.players).every((user) => user.ready)) {
       this.players.forEach((user) =>
@@ -233,6 +234,18 @@ class Game {
       );
       return;
     }
+    this.status = GameStatus.COUNTDOWN;
+    this.countdown = "3";
+    setTimeout(() => (this.countdown = "2"), 1000);
+    setTimeout(() => (this.countdown = "1"), 2000);
+    setTimeout(() => (this.countdown = "🤓"), 3000);
+    setTimeout(
+      action(() => this.startGameWithoutCountdown()),
+      3500
+    );
+  }
+
+  startGameWithoutCountdown() {
     this.deck.length = 0;
     this.selectedCards.length = 0;
     this.pile = shuffleArray(Array.from(this.cards.keys()));
@@ -310,6 +323,8 @@ decorate(Game, {
   players: observable,
   clickCard: action,
   startGame: action,
+  countdown: observable,
+  startGameWithoutCountdown: action,
   endGame: action,
   playerList: computed,
   tippIsAvailable: observable,

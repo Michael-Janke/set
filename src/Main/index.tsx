@@ -7,7 +7,7 @@ import GameUi from "./Game";
 import { GameStatus } from "../common/gameStatus";
 import CreateOrJoinGame from "./CreateOrJoinGame";
 import Lobby from "./GameLobby";
-import Finished from "./Finished";
+import Countdown from "./Countdown";
 
 export default function Main() {
   const game = useContext(Game);
@@ -15,10 +15,11 @@ export default function Main() {
     <div className="main">
       {useObserver(() => (
         <>
+          {game.status === GameStatus.COUNTDOWN && <Countdown />}
           {game.status === GameStatus.RUNNING && <GameUi />}
-          {game.status === GameStatus.LOBBY && <Lobby />}
+          {(game.status === GameStatus.LOBBY ||
+            game.status === GameStatus.FINISHED) && <Lobby />}
           {game.status === GameStatus.NONE && <CreateOrJoinGame />}
-          {game.status === GameStatus.FINISHED && <Finished />}
         </>
       ))}
     </div>

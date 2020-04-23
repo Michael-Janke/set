@@ -27,6 +27,7 @@ export enum Messages {
   SEND_TIPP = "sendTipp",
   CONTAINS_OMA = "containsOma",
   ALL_PLAYERS_READY = "allPlayersReady",
+  COUNTDOWN = "countdown",
 }
 
 export enum ErrorMessages {

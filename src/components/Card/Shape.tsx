@@ -25,6 +25,12 @@ const CrossHatch = ({
   </defs>
 );
 
+export const colors: { [x in Color]: string } = {
+  [Color.Green]: "#2e7d32",
+  [Color.Purple]: "#5e35b1",
+  [Color.Red]: "#c62828",
+};
+
 export default function ShapeSvg({ shape, color, fill }: ShapeSvgProps) {
   const paths: { [x in Shape]: string } = {
     [Shape.Wave]:
@@ -35,11 +41,6 @@ export default function ShapeSvg({ shape, color, fill }: ShapeSvgProps) {
       "m0,10.706962l29.905627,-10.706964l29.905697,10.706964l-29.905697,10.706964l-29.905627,-10.706964z",
   };
   const path = paths[shape];
-  const colors: { [x in Color]: string } = {
-    [Color.Green]: "#2e7d32",
-    [Color.Purple]: "#5e35b1",
-    [Color.Red]: "#c62828",
-  };
   const fills: { [x in Color]: string | undefined } = {
     [Fill.Dotted]: "url(#pattern" + colors[color] + ") " + colors[color],
     [Fill.Filled]: colors[color],
