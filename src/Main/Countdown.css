@@ -8,6 +8,7 @@
   overflow: hidden;
 }
 
-.countdown .score .alibi {
-  width: 1px;
+.countdown .score .number {
+  transition: color 1s;
+  transition-delay: 0.5s;
 }

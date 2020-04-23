@@ -1,6 +1,8 @@
 .score {
   position: relative;
+  transform: translateX(50%);
 }
+
 .score .number {
   position: absolute;
   top: 0;
