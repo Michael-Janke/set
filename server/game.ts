@@ -111,9 +111,7 @@ class Game {
       this.blockTimer = setTimeout(() => this.checkSet(user), MAX_SELECT_TIME);
     }
 
-    this.selectedCards.indexOf(card) >= 0
-      ? this.selectedCards.splice(this.selectedCards.indexOf(card), 1)
-      : this.selectedCards.push(card);
+    this.selectedCards.indexOf(card) == -1 && this.selectedCards.push(card);
 
     if (this.selectedCards.length === 3) this.checkSet(user);
   }

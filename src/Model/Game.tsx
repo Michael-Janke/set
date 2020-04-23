@@ -148,9 +148,7 @@ class Game {
   selectCard(i: number) {
     if (!this.ws || !this.connected) return;
     const selectedCardId = this.selectedCards.indexOf(i);
-    if (selectedCardId >= 0) {
-      this.selectedCards.splice(selectedCardId, 1);
-    } else {
+    if (selectedCardId === -1) {
       this.selectedCards.push(i);
     }
     this.ws.send(JSON.stringify([Messages.CLICK_CARD, i]));
