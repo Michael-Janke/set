@@ -43,6 +43,8 @@ class Game {
   players: Set<User> = new Set();
   blockTimer: NodeJS.Timeout | undefined;
 
+  lastSetTime = Date.now();
+
   join(user: User) {
     this.players.add(user);
     user.statistics = new Statistics();
@@ -124,6 +126,12 @@ class Game {
 
     if (isSet2) {
       user && user.statistics.sets++;
+      user &&
+        user.statistics.setTimes.push({
+          set: [...this.selectedCards],
+          time: Date.now() - this.lastSetTime,
+        });
+      this.lastSetTime = Date.now();
     } else {
       user && user.statistics.fails++;
     }
@@ -235,15 +243,24 @@ class Game {
     this.fillDeck();
     this.status = GameStatus.RUNNING;
     this.resetTippTimer();
+    this.lastSetTime = Date.now();
   }
 
   tippIsAvailable = false;
   tippTimer: NodeJS.Timeout | null = null;
   tippIndex = 0;
   sendTipp() {
-    if (!this.tippIsAvailable) return;
+    if (!this.tippIsAvailable || this.selectedCards.length === 3) return;
     const set = this.deckContainsSet();
     if (set) {
+      if (
+        this.selectedCards.some((card) =>
+          set.some((setCard) => setCard !== card)
+        )
+      ) {
+        //another set is already selected
+        this.selectedCards.length = 0;
+      }
       this.selectedCards.push(set[this.tippIndex++ % set.length]);
       if (this.selectedCards.length === 3) this.checkSet(null);
     }
