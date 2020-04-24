@@ -181,7 +181,9 @@ class Game {
     if (this.deck.indexOf(null) >= 0 && this.deck.length > NORMAL_CARD_COUNT) {
       for (let i = this.deck.length - 1; i >= NORMAL_CARD_COUNT; i--) {
         const nextFreeSpace = this.deck.indexOf(null);
-        if (nextFreeSpace >= 0) {
+        if (nextFreeSpace === this.deck.length - 1) {
+          this.deck.pop();
+        } else if (nextFreeSpace >= 0) {
           const lastCard = this.deck.pop();
           if (lastCard !== undefined) this.deck[nextFreeSpace] = lastCard;
         }
