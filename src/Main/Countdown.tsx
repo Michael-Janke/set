@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import Game from "Model/Game";
 import { observer } from "mobx-react";
 

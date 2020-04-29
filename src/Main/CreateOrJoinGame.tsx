@@ -9,7 +9,7 @@ import Error from "components/Error";
 import Button from "components/Button";
 
 export default function CreateOrJoinGame() {
-  const [code, setCode] = useState(window.location.hash);
+  const [code, setCode] = useState("");
   const game = useContext(Game);
 
   return (

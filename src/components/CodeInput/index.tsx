@@ -19,12 +19,16 @@ export default function CodeInput({
 }) {
   useEffect(() => {
     const updateCode = () => onChange(codeFilter(window.location.hash));
-    updateCode();
     window.addEventListener("hashchange", updateCode, false);
     return () => {
       window.removeEventListener("hashchange", updateCode);
     };
   }, [onChange]);
+
+  useEffect(() => {
+    onChange(codeFilter(window.location.hash));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <input
       className="codeInput"
